@@ -3,134 +3,170 @@ import type { DashboardData } from "@/types/dashboard";
 import { motion, AnimatePresence } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { AlertTriangle, ChevronDown, ChevronUp } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { computeReadiness } from "@/lib/computeReadiness";
+import { cn } from "@/lib/utils";
+import {
+    PolarGrid,
+    RadialBar,
+    RadialBarChart,
+} from "recharts";
+import {
+    ChartContainer,
+    ChartTooltip,
+} from "@/components/ui/chart";
 
 interface ReadinessCardProps {
     data: DashboardData;
     className?: string;
 }
 
+const levelToBadgeClass: Record<string, string> = {
+    High: "bg-emerald-500/15 text-emerald-300 border-emerald-500/25",
+    Warm: "bg-violet-500/15 text-violet-300 border-violet-500/25",
+    Early: "bg-sky-500/15 text-sky-300 border-sky-500/25",
+    Cold: "bg-slate-500/15 text-slate-300 border-slate-500/25",
+};
+
 export function ReadinessCard({ data, className }: ReadinessCardProps) {
     const [isRisksExpanded, setIsRisksExpanded] = useState(false);
 
-    // 1. Calculate Readiness Score
-    // Base = opportunity_score (default 50)
-    let score = data.deal_strength.score || 50;
-    const risks = data.risk_analysis.risks;
+    const model = useMemo(() => computeReadiness(data), [data]);
+    const risks = data.risk_analysis?.risks ?? [];
 
-    // +15 if decision maker exists
-    const hasDecisionMaker = data.stakeholders.some(s => s.role.toLowerCase().includes('decision') || s.influence === 'High');
-    if (hasDecisionMaker) score += 15;
-
-    // +10 if 2+ pain points
-    if (data.pain_urgency.pain_points.length >= 2) score += 10;
-
-    // +10 if procurement steps known (not empty)
-    if (data.buying_process.steps.length > 0) score += 10;
-
-    // +5 if next steps exist (Action Engine tasks)
-    if (data.action_engine.tasks.length > 0) score += 5;
-
-    // -10 if 3+ risks
-    if (risks.length >= 3) score -= 10;
-
-    // -5 if budget unknown/null
-    if (!data.budget?.status || data.budget.status === 'Unknown') score -= 5;
-
-    // Clamp 0-100
-    score = Math.max(0, Math.min(100, score));
-
-    // Ring Logic
-    const radius = 40;
-    const stroke = 6;
-    const normalizedRadius = radius - stroke * 2;
-    const circumference = normalizedRadius * 2 * Math.PI;
-    const strokeDashoffset = circumference - (score / 100) * circumference;
-
-    // Color logic
-    const getColor = (s: number) => {
-        if (s >= 70) return "#10b981"; // Emerald 500
-        if (s >= 40) return "#fbbf24"; // Amber 400
-        return "#ef4444"; // Red 500
-    };
-
-    const meterColor = getColor(score);
-
-    // 2. Calculate Factors (Authority, Pain, Clarity)
-    const authorityScore = hasDecisionMaker ? 90 : 40;
-    const painScore = Math.min(100, data.pain_urgency.pain_points.length * 35);
-    const clarityScore = data.buying_process.steps.length > 0 ? 80 : 30;
-
-    const factors = [
-        { label: "Authority", score: authorityScore, color: "text-emerald-400", bg: "bg-emerald-500" },
-        { label: "Pain", score: painScore, color: "text-rose-400", bg: "bg-rose-500" },
-        { label: "Clarity", score: clarityScore, color: "text-blue-400", bg: "bg-blue-500" },
-    ];
+    // Helper to describe a full circle arc (or almost full)
+    // For full circle, we can use simple circle element, but let's stick to path for animation control if needed.
+    // Actually, circle is easier for concentric rings.
 
     return (
-        <GlassCard className={`p-0 flex flex-col ${className}`} hoverEffect={true}>
-            {/* Upper Section: Score & Ring */}
-            <div className="p-6 pb-2">
-                <div className="flex justify-between items-start mb-4">
-                    <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wide">Readiness Index</h3>
-                    <Badge variant={score > 70 ? "default" : "secondary"} className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 text-[10px] px-2 h-5">
-                        {data.deal_strength.signal}
-                    </Badge>
-                </div>
-
-                <div className="flex items-center justify-between">
-                    <div>
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            className="text-6xl font-bold text-slate-100 tracking-tighter"
-                        >
-                            {score}%
-                        </motion.div>
-                        <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Deal Probability</div>
+        <GlassCard className={cn("p-0 flex flex-col", className)} hoverEffect>
+            {/* Header */}
+            <div className="w-full p-4 pb-0 flex items-start justify-between">
+                <div>
+                    <div className="text-sm font-semibold text-slate-500 uppercase tracking-wide">
+                        Readiness Index
                     </div>
+                    <div className="text-xs text-slate-500 mt-1">
+                        Signal coverage & engagement
+                    </div>
+                </div>
+                <Badge
+                    variant="secondary"
+                    className={cn(
+                        "text-[10px] px-2 h-5 border",
+                        levelToBadgeClass[model.level]
+                    )}
+                >
+                    {model.level}
+                </Badge>
+            </div>
 
-                    <div className="relative w-24 h-24 flex items-center justify-center">
-                        <svg height={radius * 2} width={radius * 2} className="rotate-[-90deg]">
-                            <circle
-                                stroke="rgba(255,255,255,0.05)"
-                                strokeWidth={stroke}
-                                fill="transparent"
-                                r={normalizedRadius}
-                                cx={radius}
-                                cy={radius}
+            {/* Main Content: Chart */}
+            <div className="flex flex-col items-center justify-center p-2">
+                <div className="relative flex items-center justify-center w-[220px] h-[220px]">
+                    <ChartContainer
+                        config={{
+                            authority: { label: "Authority", color: "rgba(16, 185, 129, 0.8)" },
+                            pain: { label: "Pain Points", color: "rgba(139, 92, 246, 0.8)" },
+                            process: { label: "Process", color: "rgba(14, 165, 233, 0.8)" },
+                            next_steps: { label: "Next Steps", color: "rgba(59, 130, 246, 0.8)" },
+                            risk: { label: "Risk", color: "rgba(245, 158, 11, 0.8)" }, // amber-500
+                            budget: { label: "Budget", color: "rgba(100, 116, 139, 0.8)" }, // slate-500
+                        }}
+                        className="mx-auto w-full h-full"
+                    >
+                        <RadialBarChart
+                            // Map all factors to the chart
+                            data={model.factors.map(f => ({
+                                name: f.label,
+                                key: f.key,
+                                score: f.score,
+                                weightPoints: f.weightPoints,
+                                fill: `var(--color-${f.key})`,
+                            }))}
+                            innerRadius={40}
+                            outerRadius={90}
+                            barSize={10}
+                            startAngle={90}
+                            endAngle={450}
+                        >
+                            <PolarGrid
+                                gridType="circle"
+                                radialLines={false}
+                                stroke="none"
+                                className="first:fill-muted last:fill-background"
+                                polarRadius={[90, 80]}
                             />
-                            <motion.circle
-                                stroke={meterColor}
-                                strokeWidth={stroke}
-                                fill="transparent"
-                                r={normalizedRadius}
-                                cx={radius}
-                                cy={radius}
-                                strokeLinecap="round"
-                                initial={{ strokeDashoffset: circumference }}
-                                animate={{ strokeDashoffset }}
-                                style={{ strokeDasharray: circumference + ' ' + circumference }}
-                                transition={{ duration: 1.5, ease: "easeOut" }}
+                            <RadialBar
+                                dataKey="score"
+                                background={{ fill: "rgba(255,255,255,0.05)" }}
+                                cornerRadius={10}
                             />
-                        </svg>
+                            <ChartTooltip
+                                cursor={false}
+                                content={({ active, payload }) => {
+                                    if (active && payload && payload.length) {
+                                        const data = payload[0].payload;
+                                        return (
+                                            <div className="grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-border/50 bg-background px-2.5 py-1.5 text-xs shadow-xl">
+                                                <div className="grid gap-1.5">
+                                                    <div className="flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 [&>svg]:text-muted-foreground items-center">
+                                                        <div
+                                                            className="h-2.5 w-2.5 shrink-0 rounded-[2px] bg-[--color-bg]"
+                                                            style={{ "--color-bg": data.fill } as React.CSSProperties}
+                                                        />
+                                                        <div className="flex flex-1 justify-between leading-none">
+                                                            <div className="grid gap-1.5">
+                                                                <span className="text-muted-foreground">
+                                                                    {data.name}
+                                                                </span>
+                                                            </div>
+                                                            <span className="font-mono font-medium tabular-nums text-foreground">
+                                                                {data.weightPoints > 0 ? "+" : ""}{data.weightPoints}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    }
+                                    return null;
+                                }}
+                            />
+                        </RadialBarChart>
+                    </ChartContainer>
+
+                    {/* Centered Total Score - Dark color small */}
+                    <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                        <span className="text-2xl font-bold text-slate-600">
+                            {model.score}%
+                        </span>
+                        <span className="text-[10px] font-bold text-slate-600/70 uppercase tracking-widest">
+                            Total
+                        </span>
                     </div>
                 </div>
             </div>
 
-            {/* Middle Section: Risks Expander */}
-            <div className="mt-2 border-t border-white/5">
+            {/* Risk Flags expander */}
+            <div className="w-full border-t border-white/5">
                 <button
-                    onClick={() => setIsRisksExpanded(!isRisksExpanded)}
-                    className="w-full flex items-center justify-between p-4 hover:bg-white/5 transition-colors group"
+                    onClick={() => setIsRisksExpanded(v => !v)}
+                    className="w-full flex items-center justify-between px-6 py-4 hover:bg-white/5 transition-colors"
                 >
-                    <div className="flex items-center gap-2 text-rose-400">
+                    <div className="flex items-center gap-2 text-amber-500">
                         <AlertTriangle className="w-4 h-4" />
-                        <span className="text-xs font-bold uppercase">Risk Flags</span>
+                        <span className="text-xs font-semibold uppercase tracking-wide">Risk Flags</span>
                     </div>
                     <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-slate-500">{risks.length} Detected</span>
-                        {isRisksExpanded ? <ChevronUp className="w-4 h-4 text-slate-500" /> : <ChevronDown className="w-4 h-4 text-slate-500" />}
+                        <span className="text-xs font-semibold text-slate-500">
+                            {risks.length} detected
+                        </span>
+                        {isRisksExpanded ? (
+                            <ChevronUp className="w-4 h-4 text-slate-500" />
+                        ) : (
+                            <ChevronDown className="w-4 h-4 text-slate-500" />
+                        )}
                     </div>
                 </button>
 
@@ -140,16 +176,23 @@ export function ReadinessCard({ data, className }: ReadinessCardProps) {
                             initial={{ height: 0, opacity: 0 }}
                             animate={{ height: "auto", opacity: 1 }}
                             exit={{ height: 0, opacity: 0 }}
-                            className="overflow-hidden bg-black/20"
+                            className="overflow-hidden"
                         >
-                            <div className="p-4 pt-0 space-y-2">
+                            <div className="px-6 pb-5 space-y-2">
                                 {risks.length === 0 ? (
-                                    <div className="text-xs text-slate-500 italic p-2">No risks detected.</div>
+                                    <div className="text-xs text-slate-500 italic py-2">
+                                        No explicit risk flags found.
+                                    </div>
                                 ) : (
-                                    risks.map((risk, i) => (
-                                        <div key={i} className="flex gap-3 p-2 rounded-lg bg-rose-500/5 border border-rose-500/10">
-                                            <AlertTriangle className="w-3.5 h-3.5 text-rose-400 shrink-0 mt-0.5" />
-                                            <span className="text-xs text-rose-200/80 leading-relaxed">{risk.description}</span>
+                                    risks.slice(0, 6).map((risk, i) => (
+                                        <div
+                                            key={i}
+                                            className="flex gap-3 p-2 rounded-xl bg-white/5 border border-white/5"
+                                        >
+                                            <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
+                                            <span className="text-xs text-slate-400 leading-relaxed">
+                                                {risk.description}
+                                            </span>
                                         </div>
                                     ))
                                 )}
@@ -157,26 +200,6 @@ export function ReadinessCard({ data, className }: ReadinessCardProps) {
                         </motion.div>
                     )}
                 </AnimatePresence>
-            </div>
-
-            {/* Bottom Section: 3 Bars (Restored) */}
-            <div className="p-6 pt-2 border-t border-white/5 space-y-4">
-                {factors.map((factor, i) => (
-                    <div key={i} className="space-y-1.5">
-                        <div className="flex justify-between items-center text-xs">
-                            <span className="font-medium text-slate-400 uppercase tracking-tight">{factor.label}</span>
-                            <span className={`font-bold ${factor.color}`}>{factor.score}/100</span>
-                        </div>
-                        <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
-                            <motion.div
-                                initial={{ width: 0 }}
-                                animate={{ width: `${factor.score}%` }}
-                                transition={{ delay: 0.5 + (i * 0.1), duration: 0.8 }}
-                                className={`h-full ${factor.bg}`}
-                            />
-                        </div>
-                    </div>
-                ))}
             </div>
         </GlassCard>
     );

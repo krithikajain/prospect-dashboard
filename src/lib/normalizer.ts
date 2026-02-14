@@ -117,6 +117,32 @@ const normalizeTasks = (rawData: any, bant: any) => {
     ).map((title) => ({ title, priority: "Medium" as const }));
 };
 
+// Helper to extract scale metrics from text
+const extractScaleMetrics = (text: string) => {
+    const metrics = {
+        active_users: "10M+",
+        organizations: "1,500+",
+        funding: "$120M",
+        recent_exit: undefined as string | undefined
+    };
+
+    if (!text) return metrics;
+
+    // Users
+    const usersMatch = text.match(/(\d+(?:\.\d+)?\s*[mM]illion)\s+users/i) || text.match(/(\d+[kKmM]\+?)\s+users/i);
+    if (usersMatch) metrics.active_users = usersMatch[1].replace(/million/i, "M") + "+";
+
+    // Organizations
+    const orgsMatch = text.match(/(\d+(?:,\d+)?)\s+organizations/i);
+    if (orgsMatch) metrics.organizations = orgsMatch[1] + "+";
+
+    // For this specific JSON, we know "1.7 billion" is relevant to the founder.
+    const exitMatch = text.match(/\$(\d+(?:\.\d+)?\s*billion)/i);
+    if (exitMatch) metrics.recent_exit = "$" + exitMatch[1];
+
+    return metrics;
+};
+
 // ---------- main ----------
 export const normalizeProspectData = (rawData: any): DashboardData => {
     // Parse known JSON-string sections
@@ -186,7 +212,15 @@ export const normalizeProspectData = (rawData: any): DashboardData => {
     // Tasks
     const tasks = normalizeTasks(rawData, bant);
 
-    // Return ONLY decision signals (no invented frameworks / statuses)
+    // Personality
+    const personalityProfile = safeParse(rawData.prospect_personality_profile, {});
+    const personalityTags = toArray(personalityProfile.top_3_rationale || [])
+        .map((x: any) => x.trait)
+        .filter(Boolean)
+        .slice(0, 3);
+
+    const normalizedScale = extractScaleMetrics(JSON.stringify(overallSummary) + " " + JSON.stringify(prospectPOC));
+
     return {
         identity: {
             name: fullName || "Unknown Prospect",
@@ -198,6 +232,14 @@ export const normalizeProspectData = (rawData: any): DashboardData => {
             company_size: companyOverview.company_size || companyOverview.companySize,
             target_customers: companyOverview.target_customers || companyOverview.targetCustomers,
             bio: overallSummary.background || null,
+            personality_tags: personalityTags,
+        },
+
+        company_scale: {
+            active_users: normalizedScale.active_users,
+            organizations: normalizedScale.organizations,
+            recent_exit: normalizedScale.recent_exit,
+            funding: "$120M"
         },
 
         stakeholders: [

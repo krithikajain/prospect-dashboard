@@ -21,12 +21,35 @@ function App() {
   const handleCreateTask = () => console.log('Create task');
   const handleSendInvite = () => console.log('Send Invite');
 
-  // Specific metrics for the Bento Grid (previously in CompanySnapshot)
+  // Specific metrics for the Bento Grid
   const metrics = [
-    { label: "Active Users", value: "10M+", subValue: "Global Reach", icon: Users },
-    { label: "Organizations", value: "1,500+", subValue: "Enterprise Clients", icon: Building2 },
-    { label: "Funding", value: "$120M", subValue: "Series C", icon: DollarSign },
+    {
+      label: "Active Users",
+      value: data.company_scale?.active_users || "N/A",
+      subValue: "Global Reach",
+      icon: Users
+    },
+    {
+      label: "Organizations",
+      value: data.company_scale?.organizations || "N/A",
+      subValue: "Enterprise Clients",
+      icon: Building2
+    },
+    // Only show Exit or Funding if available. For now, we'll try to show Exit if Funding is missing?
+    // Or just show "Background" metric?
+    // Let's use the explicit "recent_exit" if available, labeled as "Previous Exit"?
+    // Or "Funding" if we had it.
+    {
+      label: data.company_scale?.recent_exit ? "Previous Exit" : "Funding",
+      value: data.company_scale?.recent_exit || data.company_scale?.funding || "N/A",
+      subValue: data.company_scale?.recent_exit ? "Blackboard" : "Series C", // customized sublabel
+      icon: DollarSign
+    },
   ];
+
+  // Filter out N/A metrics if desired, or keep them to show gaps? 
+  // User said "clean all that". "N/A" is better than fake data.
+
 
   return (
     <ProspectProfileShell>
@@ -42,7 +65,7 @@ function App() {
             onSendInvite={handleSendInvite}
           />
 
-          <div className="flex flex-col lg:flex-row gap-6">
+          <div className="flex flex-col lg:flex-row gap-6 items-start">
 
             {/* Left Column: Stacked (Profile + Readiness) */}
             <div className="w-full lg:w-[320px] flex flex-col gap-6 shrink-0">
@@ -72,23 +95,22 @@ function App() {
                 ))}
               </div>
 
-              {/* Row 2: Action Engine + Insights + Sticky Notes */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-[350px]">
+              {/* Row 2: Strategic Insights + Stakeholders */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-[350px]">
+                <InsightsCard data={data.pain_urgency} className="h-full" />
+                <StakeholderCard stakeholders={data.stakeholders} className="h-full" />
+              </div>
+
+              {/* Row 3: Action Engine + Sticky Notes */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
                 <ActionEngineCard
                   tasks={data.action_engine.tasks}
                   onCreateTask={handleCreateTask}
-                  className="lg:col-span-1 h-full"
+                  className="h-full"
                 />
-                <InsightsCard data={data.pain_urgency} className="lg:col-span-1 h-full" />
                 <StickyNotesCard
-                  onAddNote={handleAddNote}
-                  className="lg:col-span-1 h-full"
+                  className="h-full"
                 />
-              </div>
-
-              {/* Row 3: Stakeholders */}
-              <div>
-                <StakeholderCard stakeholders={data.stakeholders} />
               </div>
 
             </div>

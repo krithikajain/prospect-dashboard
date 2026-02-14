@@ -10,6 +10,14 @@ export interface DashboardData {
         target_customers?: string;
         email?: string;
         bio?: string;
+        personality_tags?: string[];
+    };
+    company_scale?: {
+        active_users?: string;
+        organizations?: string;
+        funding?: string;
+        revenue_growth?: string;
+        recent_exit?: string;
     };
     stakeholders: Array<{
         name: string;

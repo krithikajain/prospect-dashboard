@@ -1,8 +1,7 @@
 import { GlassCard } from "@/components/ui/GlassCard";
 import type { DashboardData } from "@/types/dashboard";
-import { Users, Plus } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
+import { Users, Shield, Briefcase } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 interface StakeholderCardProps {
     stakeholders: DashboardData['stakeholders'];
@@ -10,65 +9,57 @@ interface StakeholderCardProps {
 }
 
 export function StakeholderCard({ stakeholders, className }: StakeholderCardProps) {
-    const decisionMakers = stakeholders.filter(s => s.influence === 'High');
-    const influencers = stakeholders.filter(s => s.influence !== 'High');
+    // Sort by influence (High first)
+    const sorted = [...stakeholders].sort((a, b) => {
+        if (a.influence === 'High' && b.influence !== 'High') return -1;
+        if (a.influence !== 'High' && b.influence === 'High') return 1;
+        return 0;
+    });
 
     return (
         <GlassCard className={`p-6 flex flex-col h-full ${className}`} hoverEffect>
-            <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2 text-indigo-400">
-                    <Users className="h-4 w-4" />
-                    <h3 className="text-sm font-bold uppercase tracking-wide">Stakeholder Map</h3>
+            <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-2 text-slate-400">
+                    <Users className="w-4 h-4" />
+                    <h3 className="text-sm font-semibold uppercase tracking-wide">Stakeholder Map</h3>
                 </div>
-                <Button variant="ghost" size="sm" className="h-6 w-6 p-0 rounded-full bg-indigo-500/20 text-indigo-400 hover:bg-indigo-500/30 hover:text-indigo-300">
-                    <Plus className="w-4 h-4" />
-                </Button>
+                <Badge variant="outline" className="text-xs border-indigo-500/30 text-indigo-300 bg-indigo-500/10">
+                    {stakeholders.length} Key Players
+                </Badge>
             </div>
 
-            <Tabs defaultValue="dm" className="flex-grow flex flex-col">
-                <TabsList className="w-full grid grid-cols-2 mb-4 bg-white/5 data-[state=active]:bg-white/10">
-                    <TabsTrigger value="dm" className="text-xs data-[state=active]:bg-indigo-500/20 data-[state=active]:text-indigo-300 text-slate-400">Decision Makers</TabsTrigger>
-                    <TabsTrigger value="inf" className="text-xs data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-300 text-slate-400">Influencers</TabsTrigger>
-                </TabsList>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 overflow-y-auto pr-2 custom-scrollbar">
+                {sorted.map((s, i) => (
+                    <div
+                        key={i}
+                        className="group flex gap-3 p-3 rounded-xl bg-white/5 border border-white/10 hover:border-white/20 hover:bg-white/10 transition-all"
+                    >
+                        {/* Standard img fallback for Avatar */}
+                        <div className="h-10 w-10 shrink-0 rounded-full overflow-hidden border border-white/10 bg-slate-700">
+                            <img
+                                src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${s.name}`}
+                                alt={s.name}
+                                className="h-full w-full object-cover"
+                            />
+                        </div>
 
-                <div className="flex-grow overflow-y-auto pr-2 custom-scrollbar">
-                    <TabsContent value="dm" className="mt-0 space-y-2">
-                        {decisionMakers.length === 0 ? (
-                            <div className="text-center py-4 text-xs text-slate-500 italic">None identified.</div>
-                        ) : (
-                            decisionMakers.map((person, idx) => (
-                                <div key={idx} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors border border-transparent hover:border-indigo-500/20">
-                                    <div className="h-8 w-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-300 font-bold text-xs ring-1 ring-indigo-500/30">
-                                        {person.name.charAt(0)}
-                                    </div>
-                                    <div className="min-w-0">
-                                        <div className="text-sm font-semibold text-slate-200 truncate">{person.name}</div>
-                                        <div className="text-xs text-slate-400 truncate">{person.role}</div>
-                                    </div>
-                                </div>
-                            ))
-                        )}
-                    </TabsContent>
-
-                    <TabsContent value="inf" className="mt-0 space-y-2">
-                        {influencers.length === 0 ? (
-                            <div className="text-center py-4 text-xs text-slate-500 italic">None identified.</div>
-                        ) : (
-                            influencers.map((person, idx) => (
-                                <div key={idx} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors border border-transparent hover:border-purple-500/20">
-                                    <div className="h-8 w-8 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-300 font-bold text-xs ring-1 ring-purple-500/30">
-                                        {person.name.charAt(0)}
-                                    </div>
-                                    <div className="min-w-0">
-                                        <div className="text-sm font-semibold text-slate-200 truncate">{person.name}</div>
-                                        <div className="text-xs text-slate-400 truncate">{person.role}</div>
-                                    </div>
-                                </div>
-                            ))
-                        )}
-                    </TabsContent>
-                </div>
-            </Tabs>
+                        <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between">
+                                <p className="text-sm font-medium text-slate-200 truncate pr-2">
+                                    {s.name}
+                                </p>
+                                {s.influence === 'High' && (
+                                    <Shield className="w-3 h-3 text-amber-400 shrink-0" />
+                                )}
+                            </div>
+                            <div className="flex items-center gap-1.5 mt-0.5">
+                                <Briefcase className="w-3 h-3 text-slate-500" />
+                                <p className="text-xs text-slate-400 truncate">{s.role}</p>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
         </GlassCard>
     );
 }
