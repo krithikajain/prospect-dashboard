@@ -66,12 +66,12 @@ export function ReadinessCard({ data, className }: ReadinessCardProps) {
                 <div className="relative flex items-center justify-center w-[220px] h-[220px]">
                     <ChartContainer
                         config={{
-                            authority: { label: "Authority", color: "rgba(16, 185, 129, 0.8)" },
-                            pain: { label: "Pain Points", color: "rgba(139, 92, 246, 0.8)" },
-                            process: { label: "Process", color: "rgba(14, 165, 233, 0.8)" },
-                            next_steps: { label: "Next Steps", color: "rgba(59, 130, 246, 0.8)" },
-                            risk: { label: "Risk", color: "rgba(245, 158, 11, 0.8)" }, // amber-500
-                            budget: { label: "Budget", color: "rgba(100, 116, 139, 0.8)" }, // slate-500
+                            authority: { label: "Authority", color: "rgba(16, 185, 129, 0.9)" }, // emerald-500
+                            pain: { label: "Pain Points", color: "rgba(244, 63, 94, 0.9)" },     // rose-500 (Matches Insights Pain)
+                            process: { label: "Process", color: "rgba(139, 92, 246, 0.9)" },     // violet-500
+                            next_steps: { label: "Next Steps", color: "rgba(14, 165, 233, 0.9)" }, // sky-500
+                            risk: { label: "Risk", color: "rgba(245, 158, 11, 0.9)" },           // amber-500
+                            budget: { label: "Budget", color: "rgba(100, 116, 139, 0.9)" },      // slate-500
                         }}
                         className="mx-auto w-full h-full"
                     >

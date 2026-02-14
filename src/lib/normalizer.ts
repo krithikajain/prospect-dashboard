@@ -105,16 +105,25 @@ const deriveBudgetSignal = (budgetAnalysis: any): "Likely" | "Unclear" | "Unknow
     return "Unclear";
 };
 
-const normalizeTasks = (rawData: any, bant: any) => {
-    const raw =
+const normalizeTasks = (rawData: any, bant: any, buyingCycle: any) => {
+    const bantSteps = toArray(
         (Array.isArray(rawData?.actionable_next_steps) && rawData.actionable_next_steps) ||
         (Array.isArray(bant?.actionable_next_steps) && bant.actionable_next_steps) ||
-        [];
+        []
+    );
+
+    const salesInsights = toArray(
+        buyingCycle?.actionable_sales_insights?.insights ||
+        buyingCycle?.actionableSalesInsights?.insights ||
+        []
+    );
+
+    const allItems = [...salesInsights, ...bantSteps];
 
     return cap(
-        uniq(raw.map((s: any) => cleanText(s)).filter(Boolean)),
-        6
-    ).map((title) => ({ title, priority: "Medium" as const }));
+        uniq(allItems.map((s: any) => cleanText(s)).filter(Boolean)),
+        10 // Increased cap to accommodate more insights
+    ).map((title) => ({ title, priority: "High" as const }));
 };
 
 // Helper to extract scale metrics from text
@@ -210,7 +219,7 @@ export const normalizeProspectData = (rawData: any): DashboardData => {
     const dealStrength = (bant.deal_strength_rating || bant.dealStrengthRating || "Unknown").toString();
 
     // Tasks
-    const tasks = normalizeTasks(rawData, bant);
+    const tasks = normalizeTasks(rawData, bant, buyingCycle);
 
     // Personality
     const personalityProfile = safeParse(rawData.prospect_personality_profile, {});
@@ -220,6 +229,12 @@ export const normalizeProspectData = (rawData: any): DashboardData => {
         .slice(0, 3);
 
     const normalizedScale = extractScaleMetrics(JSON.stringify(overallSummary) + " " + JSON.stringify(prospectPOC));
+
+    // Extract Industry Metrics (CAGR, Market Size)
+    // "USD 605.4 billion by 2030, at a CAGR of 12.8%"
+    const trendText = JSON.stringify(industryTrends.top_trends || []);
+    const marketMatch = trendText.match(/USD\s+([\d\.]+\s+(?:billion|trillion))/i);
+    const cagrMatch = trendText.match(/CAGR\s+of\s+([\d\.]+%?)/i);
 
     return {
         identity: {
@@ -300,6 +315,8 @@ export const normalizeProspectData = (rawData: any): DashboardData => {
 
         industry_trends: {
             industry: industryTrends.industry || "Unknown Industry",
+            market_cap: marketMatch ? `$${marketMatch[1].replace('billion', 'B').replace('trillion', 'T')}` : undefined,
+            growth_rate: cagrMatch ? cagrMatch[1] : undefined
         },
 
         // REMOVE qualification_framework entirely (not part of the “no narrative” spec)

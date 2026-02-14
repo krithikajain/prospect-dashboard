@@ -38,7 +38,7 @@ export function ActionEngineCard({ tasks, className, onCreateTask }: ActionEngin
                 <div className="flex items-center gap-3 text-indigo-400">
                     <PlayCircle className="h-6 w-6" />
                     <div>
-                        <h3 className="text-lg font-bold tracking-tight text-slate-100">Action Engine</h3>
+                        <h3 className="text-lg font-bold tracking-tight text-slate-100">Suggested Plays</h3>
                         <p className="text-xs text-slate-400 font-medium uppercase tracking-wide">
                             {doneCount} / {totalCount} Completed
                         </p>

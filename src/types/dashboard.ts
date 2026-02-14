@@ -72,6 +72,8 @@ export interface DashboardData {
     };
     industry_trends: {
         industry: string;
+        growth_rate?: string;
+        market_cap?: string;
     };
 }
 

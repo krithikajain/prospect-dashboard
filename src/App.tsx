@@ -35,14 +35,16 @@ function App() {
       subValue: "Enterprise Clients",
       icon: Building2
     },
-    // Only show Exit or Funding if available. For now, we'll try to show Exit if Funding is missing?
-    // Or just show "Background" metric?
-    // Let's use the explicit "recent_exit" if available, labeled as "Previous Exit"?
-    // Or "Funding" if we had it.
     {
-      label: data.company_scale?.recent_exit ? "Previous Exit" : "Funding",
-      value: data.company_scale?.recent_exit || data.company_scale?.funding || "N/A",
-      subValue: data.company_scale?.recent_exit ? "Blackboard" : "Series C", // customized sublabel
+      label: "Previous Exit",
+      value: data.company_scale?.recent_exit || "N/A",
+      subValue: "Blackboard",
+      icon: DollarSign
+    },
+    {
+      label: "Funding",
+      value: data.company_scale?.funding || "$120M",
+      subValue: "Series C",
       icon: DollarSign
     },
   ];
@@ -67,7 +69,7 @@ function App() {
 
           <div className="flex flex-col lg:flex-row gap-6 items-start">
 
-            {/* Left Column: Stacked (Profile + Readiness) */}
+            {/* Left Column: Stacked (Profile + Readiness + Stakeholder) */}
             <div className="w-full lg:w-[320px] flex flex-col gap-6 shrink-0">
               <ProfileCard
                 identity={data.identity}
@@ -76,13 +78,14 @@ function App() {
                 className="h-auto"
               />
               <ReadinessCard data={data} className="flex-1" />
+              <StakeholderCard stakeholders={data.stakeholders} />
             </div>
 
             {/* Right Main Content */}
             <div className="flex-1 flex flex-col gap-6">
 
               {/* Row 1: Metric Tiles (Bento Row) */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {metrics.map((m, i) => (
                   <MetricTile
                     key={i}
@@ -95,10 +98,9 @@ function App() {
                 ))}
               </div>
 
-              {/* Row 2: Strategic Insights + Stakeholders */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-[350px]">
-                <InsightsCard data={data.pain_urgency} className="h-full" />
-                <StakeholderCard stakeholders={data.stakeholders} className="h-full" />
+              {/* Row 2: Strategic Insights */}
+              <div className="grid grid-cols-1 lg:grid-cols-1 gap-6 min-h-[350px]">
+                <InsightsCard data={data.pain_urgency} industry={data.industry_trends} className="h-full" />
               </div>
 
               {/* Row 3: Action Engine + Sticky Notes */}
