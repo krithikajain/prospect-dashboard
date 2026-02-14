@@ -120,12 +120,12 @@ const ChartTooltipContent = React.forwardRef<
             className,
             indicator = "dot",
             hideLabel = false,
-            hideIndicator = false,
+
             label,
             labelFormatter,
             labelKey,
-            nameKey,
-            color,
+
+
         },
         ref
     ) => {
@@ -179,10 +179,6 @@ const ChartTooltipContent = React.forwardRef<
                 {!nestLabel ? tooltipLabel : null}
                 <div className="grid gap-1.5">
                     {payload.map((item, index) => {
-                        const key = `${nameKey || item.name || item.dataKey || "value"}`
-                        const itemConfig = getPayloadConfigFromPayload(config, item, key)
-                        const indicatorColor = color || item.payload.fill || item.color
-
                         return (
                             <div
                                 key={item.dataKey}
@@ -302,7 +298,7 @@ function getPayloadConfigFromPayload(
         : config[key as keyof typeof config]
 }
 
-function formatter(value: any, name: any, item: any, index: any, payload: any) {
+function formatter(value: any, name: any, item: any, _index: any, _payload: any) {
     return (
         <>
             {item.color && (
