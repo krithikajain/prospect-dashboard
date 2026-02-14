@@ -9,6 +9,7 @@ export interface DashboardData {
         company_size?: string;
         target_customers?: string;
         email?: string;
+        bio?: string;
     };
     stakeholders: Array<{
         name: string;
@@ -28,8 +29,8 @@ export interface DashboardData {
     buying_process: {
         steps: Array<{
             name: string;
-            status: 'Completed' | 'In Progress' | 'Pending';
-            date?: string;
+            status: 'Completed' | 'In Progress' | 'Pending' | 'Unknown';
+            date?: string | null;
         }>;
         key_drivers: string[];
     };
@@ -42,7 +43,7 @@ export interface DashboardData {
     // Kept for backward compatibility if needed, but likely deprecated
     budget: {
         status: string;
-        justification: string;
+        justification: string | null;
     };
     pain_urgency: {
         pain_points: string[];
@@ -50,8 +51,10 @@ export interface DashboardData {
         decision_drivers: string[];
     };
     deal_strength: {
+        score: number;
+        signal: string;
         rating: string;
-        risks: string[];
+        risks: string[]; // For backward compatibility if needed
     };
     action_engine: {
         tasks: Array<{

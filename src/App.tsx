@@ -1,82 +1,104 @@
-import { useState } from 'react';
-import { StageDashboardShell } from '@/components/dashboard/StageDashboardShell';
-import { QualificationHub } from '@/components/cards/QualificationHub';
-import { StakeholderMap } from '@/components/cards/StakeholderMap';
-import { ExecutionDeck } from '@/components/cards/ExecutionDeck';
-import { NotesCard } from '@/components/cards/NotesCard';
-import { AddNoteDialog } from '@/components/dialogs/AddNoteDialog';
-import { CreateTaskDialog } from '@/components/dialogs/CreateTaskDialog';
-import { SendInviteDialog } from '@/components/dialogs/SendInviteDialog';
-import { currentProspect } from '@/data/prospectData';
+import { ProspectProfileShell } from '@/components/dashboard/ProspectProfileShell';
+import { Navbar } from '@/components/dashboard/Navbar';
+import { ProfileCard } from '@/components/dashboard/ProfileCard';
+import { ReadinessCard } from '@/components/dashboard/ReadinessCard';
+import { ActionEngineCard } from '@/components/dashboard/ActionEngineCard';
+import { StakeholderCard } from '@/components/dashboard/StakeholderCard';
+import { InsightsCard } from '@/components/dashboard/InsightsCard';
+import { StickyNotesCard } from '@/components/dashboard/StickyNotesCard';
+import { RiskFlagsCard } from '@/components/dashboard/RiskFlagsCard';
+import { CompanySnapshotCard } from '@/components/dashboard/CompanySnapshotCard';
+import { normalizeProspectData } from '@/lib/normalizer';
+import rawData from '@/data/studio_results_20260212_1512.json';
 
 function App() {
-  const [data] = useState(currentProspect);
+  const data = normalizeProspectData(rawData[0]);
 
-  // Dialog States
-  const [isNoteOpen, setIsNoteOpen] = useState(false);
-  const [isTaskOpen, setIsTaskOpen] = useState(false);
-  const [isInviteOpen, setIsInviteOpen] = useState(false);
-  const [taskDefaultTitle, setTaskDefaultTitle] = useState('');
-
-  // Handlers
-  const handleAddNote = () => setIsNoteOpen(true);
-
-  const handleCreateTask = (title?: string) => {
-    if (typeof title === 'string') {
-      setTaskDefaultTitle(title);
-    } else {
-      setTaskDefaultTitle('');
-    }
-    setIsTaskOpen(true);
-  };
-
-  const handleSendInvite = () => setIsInviteOpen(true);
+  // Placeholder handlers
+  const handleAddNote = () => console.log('Add note');
+  const handleCreateTask = () => console.log('Create task');
 
   return (
-    <div className="bg-background min-h-screen font-sans text-foreground">
-      <StageDashboardShell
-        data={data}
-        onAddNote={handleAddNote}
-        onCreateTask={() => handleCreateTask()}
-        onSendInvite={handleSendInvite}
-      >
-        {/* Left Column (Intelligence) - 4 cols wide on large screens */}
-        <div className="col-span-1 lg:col-span-4 flex flex-col gap-6">
-          <div className="min-h-[250px]">
-            <QualificationHub data={data} />
-          </div>
-          <div className="min-h-[300px] flex-grow">
-            <StakeholderMap data={data} />
-          </div>
-        </div>
+    <ProspectProfileShell>
+      <div className="space-y-6">
+        <Navbar />
 
-        {/* Right Column (Execution) - 8 cols wide on large screens */}
-        <div className="col-span-1 lg:col-span-8 flex flex-col gap-6">
-          <div className="min-h-[500px]">
-            <ExecutionDeck data={data} />
-          </div>
-          <div className="min-h-[300px]">
-            {/* Reusing NotesCard for Timeline, making it full width in this column */}
-            <NotesCard onAddNoteClick={handleAddNote} />
-          </div>
-        </div>
-      </StageDashboardShell>
+        {/* Main Grid: 12 Columns */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 pb-20">
 
-      {/* Dialogs */}
-      <AddNoteDialog open={isNoteOpen} onOpenChange={setIsNoteOpen} />
-      <CreateTaskDialog
-        open={isTaskOpen}
-        onOpenChange={setIsTaskOpen}
-        defaultTitle={taskDefaultTitle}
-      />
-      <SendInviteDialog
-        open={isInviteOpen}
-        onOpenChange={setIsInviteOpen}
-        defaultEmail={data.identity.email}
-      />
-    </div>
+          {/* --- ROW 1: PRIMARY IDENTITY & METRICS --- */}
+
+          {/* Col 1: Hero Profile (4 cols) */}
+          <div className="md:col-span-6 lg:col-span-4 h-[440px]">
+            <ProfileCard
+              identity={data.identity}
+              className="h-full"
+            />
+          </div>
+
+          {/* Col 2: Company Snapshot (4 cols) */}
+          <div className="md:col-span-6 lg:col-span-4 h-[440px]">
+            <CompanySnapshotCard
+              identity={data.identity}
+              className="h-full"
+            />
+          </div>
+
+          {/* Col 3: Readiness Index (4 cols) */}
+          <div className="md:col-span-12 lg:col-span-4 h-[440px]">
+            <ReadinessCard
+              data={data}
+              className="h-full"
+            />
+          </div>
+
+          {/* --- ROW 2: CONTEXT & ACTION --- */}
+
+          {/* Col 1: Stakeholders (4 cols) */}
+          <div className="md:col-span-6 lg:col-span-4 h-[380px]">
+            <StakeholderCard
+              stakeholders={data.stakeholders}
+              className="h-full"
+            />
+          </div>
+
+          {/* Col 2: Insights (4 cols) */}
+          <div className="md:col-span-6 lg:col-span-4 h-[380px]">
+            <InsightsCard
+              data={data.pain_urgency}
+              className="h-full"
+            />
+          </div>
+
+          {/* Col 3: Action Engine (4 cols) */}
+          <div className="md:col-span-12 lg:col-span-4 h-[380px]">
+            <ActionEngineCard
+              tasks={data.action_engine.tasks}
+              onCreateTask={handleCreateTask}
+              className="h-full"
+            />
+          </div>
+
+          {/* --- ROW 3: TERTIARY --- */}
+
+          {/* Notes (8 cols) */}
+          <div className="md:col-span-12 lg:col-span-8">
+            <RiskFlagsCard
+              risks={data.risk_analysis.risks}
+            />
+          </div>
+
+          {/* Risks (4 cols - swapped to match visual hierarchy often seen: notes + risks) */}
+          <div className="md:col-span-12 lg:col-span-4">
+            <StickyNotesCard
+              onAddNote={handleAddNote}
+            />
+          </div>
+
+        </div>
+      </div>
+    </ProspectProfileShell>
   );
 }
 
 export default App;
-
