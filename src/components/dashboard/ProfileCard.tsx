@@ -56,6 +56,18 @@ export function ProfileCard({
                     ) : null}
                 </div>
 
+                {/* Personality Tags */}
+                {identity.personality_tags && identity.personality_tags.length > 0 && (
+                    <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
+                        {identity.personality_tags.map((tag, i) => (
+                            <span key={i} className="flex items-center gap-2">
+                                {i > 0 && <span className="text-slate-600">•</span>}
+                                {tag}
+                            </span>
+                        ))}
+                    </div>
+                )}
+
 
 
                 {/* Social Icons */}

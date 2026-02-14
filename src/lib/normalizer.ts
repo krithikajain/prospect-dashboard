@@ -122,7 +122,7 @@ const normalizeTasks = (rawData: any, bant: any, buyingCycle: any) => {
 
     return cap(
         uniq(allItems.map((s: any) => cleanText(s)).filter(Boolean)),
-        10 // Increased cap to accommodate more insights
+        3
     ).map((title) => ({ title, priority: "High" as const }));
 };
 
