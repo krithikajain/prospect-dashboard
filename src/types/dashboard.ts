@@ -62,6 +62,9 @@ export interface DashboardData {
             priority?: 'High' | 'Medium' | 'Low';
         }>;
     };
+    industry_trends: {
+        industry: string;
+    };
 }
 
 export interface Note {

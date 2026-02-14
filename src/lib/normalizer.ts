@@ -256,6 +256,10 @@ export const normalizeProspectData = (rawData: any): DashboardData => {
             tasks,
         },
 
+        industry_trends: {
+            industry: industryTrends.industry || "Unknown Industry",
+        },
+
         // REMOVE qualification_framework entirely (not part of the “no narrative” spec)
         qualification_framework: undefined as any,
     };
