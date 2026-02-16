@@ -58,10 +58,14 @@ export function StickyNotesCard({ className }: StickyNotesCardProps) {
 
     return (
         <GlassCard className={`p-4 ${className}`} hoverEffect>
-            <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2 text-indigo-200">
-                    <StickyNote className="h-4 w-4" />
-                    <h3 className="text-xs font-extra-bold uppercase tracking-wide text-white">My Notes</h3>
+            <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                    <div className="p-2 rounded-xl bg-yellow-500/20 text-yellow-300 border border-yellow-500/30">
+                        <StickyNote className="w-4 h-4" />
+                    </div>
+                    <h3 className="text-sm font-bold text-white uppercase tracking-wide text-glow">
+                        Field Notes
+                    </h3>
                 </div>
                 <Button
                     size="icon"

@@ -39,10 +39,10 @@ function Meter({
     return (
         <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-2">
             <div className="flex items-center justify-between">
-                <div className="text-[10px] uppercase tracking-widest text-slate-400 font-semibold">
+                <div className="text-[10px] uppercase tracking-widest text-slate-300 font-semibold">
                     {label}
                 </div>
-                <div className="text-[11px] text-slate-300">{v}%</div>
+                <div className="text-[11px] text-slate-200">{v}%</div>
             </div>
             <div className="mt-2 h-2 rounded-full bg-white/5 border border-white/10">
                 <motion.div
@@ -83,10 +83,10 @@ function Sparkline({ values }: { values: number[] }) {
     return (
         <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-2">
             <div className="flex items-center justify-between">
-                <div className="text-[10px] uppercase tracking-widest text-slate-400 font-semibold">
+                <div className="text-[10px] uppercase tracking-widest text-slate-300 font-semibold">
                     Momentum
                 </div>
-                <div className="text-[11px] text-slate-400">proxy</div>
+                <div className="text-[11px] text-slate-300">proxy</div>
             </div>
             <div className="mt-2">
                 <svg width="100%" viewBox={`0 0 ${w} ${h}`}>
@@ -130,13 +130,13 @@ function MiniBars({
 
     return (
         <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-2">
-            <div className="text-[10px] uppercase tracking-widest text-slate-400 font-semibold">
+            <div className="text-[10px] uppercase tracking-widest text-slate-300 font-semibold">
                 Driver Lift
             </div>
             <div className="mt-3 space-y-2">
                 {items.map((it) => (
                     <div key={it.label} className="flex items-center gap-3">
-                        <div className="w-20 text-[11px] text-slate-400">{it.label}</div>
+                        <div className="w-20 text-[11px] text-slate-300">{it.label}</div>
                         <div className="flex-1 h-2 rounded-full bg-white/5 border border-white/10">
                             <motion.div
                                 className="h-2 rounded-full bg-indigo-500/35"
@@ -145,7 +145,7 @@ function MiniBars({
                                 transition={{ duration: 0.6, ease: "easeOut" }}
                             />
                         </div>
-                        <div className="w-10 text-right text-[11px] text-slate-300">
+                        <div className="w-10 text-right text-[11px] text-slate-200">
                             {it.v}%
                         </div>
                     </div>
@@ -158,13 +158,13 @@ function MiniBars({
 function Stat({ label, value, sub }: { label: string; value: string; sub?: string }) {
     return (
         <div className="flex-1 rounded-xl bg-white/5 border border-white/10 px-3 py-2">
-            <div className="text-[10px] uppercase tracking-widest text-slate-400 font-semibold">
+            <div className="text-[10px] uppercase tracking-widest text-indigo-300 font-bold">
                 {label}
             </div>
             <div className="mt-1 text-lg font-bold text-white tracking-tight">
                 {value}
             </div>
-            {sub ? <div className="text-[11px] text-slate-500 mt-0.5">{sub}</div> : null}
+            {sub ? <div className="text-[11px] text-indigo-100/80 mt-0.5 font-medium">{sub}</div> : null}
         </div>
     );
 }
@@ -200,7 +200,7 @@ export function InsightsCard({ data, industry, className }: InsightsCardProps) {
     return (
         <GlassCard className={`p-4 flex flex-col h-full ${className}`} hoverEffect>
             <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-bold text-white uppercase tracking-wide">
+                <h3 className="text-sm font-bold text-white uppercase tracking-wide text-glow">
                     Strategic Signals
                 </h3>
                 <span className="text-[11px] px-2 py-1 rounded-full bg-white/5 border border-white/10 text-slate-200">

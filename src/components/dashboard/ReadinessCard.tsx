@@ -43,10 +43,10 @@ export function ReadinessCard({ data, className }: ReadinessCardProps) {
             {/* Header */}
             <div className="w-full p-4 pb-0 flex items-start justify-between">
                 <div>
-                    <div className="text-sm font-semibold text-slate-300 uppercase tracking-wide">
+                    <div className="text-sm font-bold text-white uppercase tracking-wide text-glow">
                         Readiness Index
                     </div>
-                    <div className="text-xs text-slate-400 mt-1">
+                    <div className="text-xs text-slate-300 mt-1">
                         Signal coverage & engagement
                     </div>
                 </div>
@@ -138,10 +138,10 @@ export function ReadinessCard({ data, className }: ReadinessCardProps) {
 
                     {/* Centered Total Score - Dark color small */}
                     <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                        <span className="text-3xl font-bold text-white">
+                        <span className="text-3xl font-extrabold text-white text-glow">
                             {model.score}%
                         </span>
-                        <span className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">
+                        <span className="text-[10px] font-bold text-slate-200 uppercase tracking-widest">
                             Total
                         </span>
                     </div>
@@ -160,9 +160,9 @@ export function ReadinessCard({ data, className }: ReadinessCardProps) {
                     </div>
                     <div className="flex items-baseline gap-2">
                         {isRisksExpanded ? (
-                            <ChevronUp className="w-4 h-4 text-slate-500" />
+                            <ChevronUp className="w-4 h-4 text-slate-400" />
                         ) : (
-                            <ChevronDown className="w-4 h-4 text-slate-500" />
+                            <ChevronDown className="w-4 h-4 text-slate-400" />
                         )}
                     </div>
                 </button>

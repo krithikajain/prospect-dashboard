@@ -12,13 +12,21 @@ import { normalizeProspectData } from '@/lib/normalizer';
 import rawData from '@/data/studio_results_20260212_1512.json';
 import { Users, Building2, DollarSign } from 'lucide-react';
 
+import { useState } from 'react';
+
 function App() {
     const data = normalizeProspectData(rawData[0]);
+    const [tasks, setTasks] = useState(data.action_engine.tasks);
 
     // Placeholder handlers
-    // Placeholder handlers
     const handleAddNote = () => console.log('Add note');
-    const handleCreateTask = () => console.log('Create task');
+    const handleAddTask = (title: string) => {
+        const newTask = {
+            title,
+            priority: "High" as const, // Explicitly cast to allowed type
+        };
+        setTasks([newTask, ...tasks]);
+    };
     const handleSendInvite = () => console.log('Send Invite');
 
     // Specific metrics for the Bento Grid
@@ -59,7 +67,9 @@ function App() {
                 <Navbar />
 
                 {/* Bento Grid Layout - Main Container */}
-                <div className="relative z-10 p-5 max-w-[1640px] mx-auto mt-2 mb-4 bg-gradient-to-r from-[#4F6CA0]/90 via-[#90A0C9]/85 to-[#E5BE5B]/80 rounded-[32px] border border-white/20 shadow-8xl space-y-4">
+                <div className="relative z-10 p-5 max-w-[1640px] mx-auto mt-2 mb-4 bg-gradient-to-r from-[#4F6CA0]/40 via-[#90A0C9]/30 to-[#E5BE5B]/30 rounded-[32px] border border-white/20 shadow-8xl space-y-4 backdrop-blur-md">
+                    {/* Contrast Scrim */}
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/30 pointer-events-none rounded-[32px]" />
 
                     {/* Header Actions */}
                     <DashboardHeader
@@ -106,8 +116,8 @@ function App() {
                             {/* Row 3: Action Engine + Sticky Notes */}
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 h-full">
                                 <ActionEngineCard
-                                    tasks={data.action_engine.tasks}
-                                    onCreateTask={handleCreateTask}
+                                    tasks={tasks}
+                                    onAddTask={handleAddTask}
                                     className="h-full"
                                 />
                                 <StickyNotesCard

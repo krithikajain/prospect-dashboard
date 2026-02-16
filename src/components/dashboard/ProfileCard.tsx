@@ -40,10 +40,10 @@ export function ProfileCard({
 
                 {/* Name & Role */}
                 <div className="text-center">
-                    <h2 className="text-3xl font-bold text-white tracking-tight mb-1">
+                    <h2 className="text-3xl font-bold text-white tracking-tight mb-1 text-glow">
                         {identity.name}
                     </h2>
-                    <p className="text-base text-slate-100 font-semibold">{identity.role}</p>
+                    <p className="text-base text-slate-200 font-semibold">{identity.role}</p>
                 </div>
 
                 {/* Industry (replaced Company) */}
@@ -57,10 +57,10 @@ export function ProfileCard({
 
                 {/* Personality Tags */}
                 {identity.personality_tags && identity.personality_tags.length > 0 && (
-                    <div className="flex items-center gap-2 text-xs text-slate-100 font-medium">
+                    <div className="flex items-center gap-2 text-xs text-slate-200 font-medium">
                         {identity.personality_tags.map((tag, i) => (
                             <span key={i} className="flex items-center gap-2">
-                                {i > 0 && <span className="text-slate-300">•</span>}
+                                {i > 0 && <span className="text-slate-400">•</span>}
                                 {tag}
                             </span>
                         ))}

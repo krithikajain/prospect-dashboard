@@ -27,7 +27,7 @@ export function DashboardHeader({
                 <Button
                     variant="outline"
                     onClick={onAddNote}
-                    className="border-white/10 bg-white/5 text-slate-300 hover:text-white hover:bg-white/10 hover:border-white/20 transition-all"
+                    className="border-white/20 bg-white/10 text-white hover:bg-white/20 hover:border-white/30 transition-all font-medium shadow-sm backdrop-blur-sm"
                 >
                     <FilePlus className="w-4 h-4 mr-2" />
                     Add Note
@@ -36,7 +36,7 @@ export function DashboardHeader({
                 <Button
                     variant="outline"
                     onClick={onSendInvite}
-                    className="border-white/10 bg-white/5 text-slate-300 hover:text-white hover:bg-white/10 hover:border-white/20 transition-all"
+                    className="bg-emerald-500/80 border-emerald-500/50 text-white hover:bg-emerald-500 hover:border-emerald-400 transition-all font-medium shadow-sm backdrop-blur-sm"
                 >
                     <Send className="w-4 h-4 mr-2" />
                     Send an Invite

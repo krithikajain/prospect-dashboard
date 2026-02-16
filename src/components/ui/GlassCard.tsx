@@ -17,11 +17,11 @@ export function GlassCard({ className, children, hoverEffect = false, variant = 
             className={cn(
                 "backdrop-blur-xl shadow-2xl overflow-hidden transition-all duration-300",
                 // specific Glassmorphism technique from instructions
-                "bg-slate-500/20 border border-white/10 ring-1 ring-white/5",
+                "bg-slate-900/30 border border-white/20 ring-1 ring-white/10",
                 // Asymmetric Borders (Cyber variant)
                 variant === "cyber" && "rounded-tl-[40px] rounded-br-[40px] rounded-tr-[12px] rounded-bl-[12px]",
                 variant === "default" && "rounded-3xl",
-                hoverEffect && "hover:bg-white/10 hover:border-white/20 hover:ring-white/10",
+                hoverEffect && "hover:bg-white/4 hover:border-white/20 hover:ring-white/10",
                 className
             )}
             {...props}
