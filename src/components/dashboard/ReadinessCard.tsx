@@ -43,10 +43,10 @@ export function ReadinessCard({ data, className }: ReadinessCardProps) {
             {/* Header */}
             <div className="w-full p-4 pb-0 flex items-start justify-between">
                 <div>
-                    <div className="text-sm font-semibold text-slate-500 uppercase tracking-wide">
+                    <div className="text-sm font-semibold text-slate-300 uppercase tracking-wide">
                         Readiness Index
                     </div>
-                    <div className="text-xs text-slate-500 mt-1">
+                    <div className="text-xs text-slate-400 mt-1">
                         Signal coverage & engagement
                     </div>
                 </div>
@@ -138,10 +138,10 @@ export function ReadinessCard({ data, className }: ReadinessCardProps) {
 
                     {/* Centered Total Score - Dark color small */}
                     <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                        <span className="text-2xl font-bold text-slate-600">
+                        <span className="text-3xl font-bold text-white">
                             {model.score}%
                         </span>
-                        <span className="text-[10px] font-bold text-slate-600/70 uppercase tracking-widest">
+                        <span className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">
                             Total
                         </span>
                     </div>
@@ -158,10 +158,7 @@ export function ReadinessCard({ data, className }: ReadinessCardProps) {
                         <AlertTriangle className="w-4 h-4" />
                         <span className="text-xs font-semibold uppercase tracking-wide">Risk Flags</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                        <span className="text-xs font-semibold text-slate-500">
-                            {risks.length} detected
-                        </span>
+                    <div className="flex items-baseline gap-2">
                         {isRisksExpanded ? (
                             <ChevronUp className="w-4 h-4 text-slate-500" />
                         ) : (

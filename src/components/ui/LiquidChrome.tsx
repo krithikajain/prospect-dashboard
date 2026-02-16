@@ -6,6 +6,7 @@ import './LiquidChrome.css';
 
 interface LiquidChromeProps {
     baseColor?: [number, number, number];
+    accentColor?: [number, number, number];
     speed?: number;
     amplitude?: number;
     frequencyX?: number;
@@ -16,6 +17,7 @@ interface LiquidChromeProps {
 
 export const LiquidChrome = ({
     baseColor = [0.1, 0.1, 0.1],
+    accentColor = [0.5, 0.5, 0.5], // Default accent
     speed = 0.2,
     amplitude = 0.3,
     frequencyX = 3,
@@ -48,6 +50,7 @@ export const LiquidChrome = ({
       uniform float uTime;
       uniform vec3 uResolution;
       uniform vec3 uBaseColor;
+      uniform vec3 uAccentColor;
       uniform float uAmplitude;
       uniform float uFrequencyX;
       uniform float uFrequencyY;
@@ -69,7 +72,18 @@ export const LiquidChrome = ({
           float ripple = sin(10.0 * dist - uTime * 2.0) * 0.03;
           uv += (diff / (dist + 0.0001)) * ripple * falloff;
 
-          vec3 color = uBaseColor / abs(sin(uTime - uv.y - uv.x));
+          // Dynamic pattern based on distorted uvs
+          float pattern = abs(sin(uTime - uv.y - uv.x));
+          
+          // Mix base and accent based on horizontal position (Left=Base, Right=Accent)
+          float mixFactor = uvCoord.x;
+          // Smoothstep for better transition
+          mixFactor = smoothstep(0.0, 1.0, mixFactor);
+          
+          vec3 mixedColor = mix(uBaseColor, uAccentColor, mixFactor);
+          
+          // Apply the liquid light effect
+          vec3 color = mixedColor / pattern;
           return vec4(color, 1.0);
       }
 
@@ -97,6 +111,7 @@ export const LiquidChrome = ({
                     value: new Float32Array([gl.canvas.width, gl.canvas.height, gl.canvas.width / gl.canvas.height])
                 },
                 uBaseColor: { value: new Float32Array(baseColor) },
+                uAccentColor: { value: new Float32Array(accentColor) },
                 uAmplitude: { value: amplitude },
                 uFrequencyX: { value: frequencyX },
                 uFrequencyY: { value: frequencyY },
@@ -169,7 +184,7 @@ export const LiquidChrome = ({
             }
             gl.getExtension('WEBGL_lose_context')?.loseContext();
         };
-    }, [baseColor, speed, amplitude, frequencyX, frequencyY, interactive]);
+    }, [baseColor, accentColor, speed, amplitude, frequencyX, frequencyY, interactive]);
 
     return <div ref={containerRef} className="liquidChrome-container" {...props} />;
 };

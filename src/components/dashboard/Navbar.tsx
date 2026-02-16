@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 
 export function Navbar() {
     return (
-        <nav className="h-16 border-b border-white/5 bg-[#0B0F17]/80 backdrop-blur-xl sticky top-0 z-50">
+        <nav className="h-16 border-b border-white/10 bg-white/5 backdrop-blur-xl sticky top-0 z-50">
             <div className="container mx-auto px-6 h-16 flex items-center justify-between max-w-[1600px]">
                 {/* Logo Area */}
                 <div className="flex items-center gap-3">

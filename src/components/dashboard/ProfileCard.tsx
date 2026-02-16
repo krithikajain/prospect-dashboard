@@ -23,7 +23,6 @@ export function ProfileCard({
 }: ProfileCardProps) {
     if (!identity) return null;
 
-    const name = identity.name || "Unknown";
     const linkedInUrl = identity.linkedin || "https://www.linkedin.com/login";
 
     return (
@@ -38,19 +37,18 @@ export function ProfileCard({
 
             <div className="relative z-10 flex flex-col items-center gap-6">
 
-                {/* Name */}
-                <h1 className="text-5xl md:text-6xl font-bold text-white tracking-tight">
-                    {name}
-                </h1>
+                {/* Name & Role */}
+                <div className="text-center">
+                    <h2 className="text-3xl font-bold text-white tracking-tight mb-1">
+                        {identity.name}
+                    </h2>
+                    <p className="text-base text-slate-100 font-semibold">{identity.role}</p>
+                </div>
 
-                {/* Role Subtitle */}
-                <p className="text-lg md:text-xl text-slate-300 font-medium tracking-wide">
-                    {identity.role}
-                </p>
                 {/* Industry (replaced Company) */}
                 <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
                     {industry ? (
-                        <span className="text-[11px] uppercase font-bold text-slate-200 bg-white/5 border border-white/10 px-4 py-2 rounded-full">
+                        <span className="text-[11px] uppercase font-bold text-white bg-white/10 border border-white/20 px-4 py-2 rounded-full shadow-lg shadow-black/10">
                             {industry}
                         </span>
                     ) : null}
@@ -58,10 +56,10 @@ export function ProfileCard({
 
                 {/* Personality Tags */}
                 {identity.personality_tags && identity.personality_tags.length > 0 && (
-                    <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
+                    <div className="flex items-center gap-2 text-xs text-slate-100 font-medium">
                         {identity.personality_tags.map((tag, i) => (
                             <span key={i} className="flex items-center gap-2">
-                                {i > 0 && <span className="text-slate-600">•</span>}
+                                {i > 0 && <span className="text-slate-300">•</span>}
                                 {tag}
                             </span>
                         ))}
@@ -78,7 +76,7 @@ export function ProfileCard({
                                 <TooltipTrigger asChild>
                                     <a
                                         href={`mailto:${identity.email}`}
-                                        className="p-3 rounded-full bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white border border-white/10 transition-all duration-300 hover:scale-110"
+                                        className="p-3 rounded-full bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 transition-all duration-300 hover:scale-110"
                                     >
                                         <Mail className="w-5 h-5" />
                                     </a>

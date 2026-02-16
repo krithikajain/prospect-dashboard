@@ -200,10 +200,10 @@ export function InsightsCard({ data, industry, className }: InsightsCardProps) {
     return (
         <GlassCard className={`p-6 flex flex-col h-full ${className}`} hoverEffect>
             <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wide">
+                <h3 className="text-sm font-bold text-white uppercase tracking-wide">
                     Strategic Signals
                 </h3>
-                <span className="text-[11px] px-2 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">
+                <span className="text-[11px] px-2 py-1 rounded-full bg-white/5 border border-white/10 text-slate-200">
                     {pain.length + timing.length + drivers.length} signals
                 </span>
             </div>
@@ -225,10 +225,11 @@ export function InsightsCard({ data, industry, className }: InsightsCardProps) {
 
                     <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 flex-1">
                         <div className="flex items-center justify-between mb-2">
-                            <div className="text-[10px] uppercase tracking-widest text-slate-400 font-semibold">
+                            <div className="text-[10px] uppercase tracking-widest text-slate-300 font-semibold">
                                 Key Risks
                             </div>
                             <div className="flex items-center gap-1 text-slate-400">
+
                                 <TriangleAlert className="w-3.5 h-3.5" />
                                 <span className="text-[11px]">{riskChips.length}</span>
                             </div>

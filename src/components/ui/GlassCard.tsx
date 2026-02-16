@@ -16,12 +16,12 @@ export function GlassCard({ className, children, hoverEffect = false, variant = 
             whileHover={hoverEffect ? { y: -2, boxShadow: "0 20px 40px -12px rgba(0, 0, 0, 0.5)" } : undefined}
             className={cn(
                 "backdrop-blur-xl shadow-2xl overflow-hidden transition-all duration-300",
-                // Dark Glass Style
-                "bg-slate-900/60 border border-white/10 ring-1 ring-white/5",
+                // specific Glassmorphism technique from instructions
+                "bg-slate-500/20 border border-white/10 ring-1 ring-white/5",
                 // Asymmetric Borders (Cyber variant)
                 variant === "cyber" && "rounded-tl-[40px] rounded-br-[40px] rounded-tr-[12px] rounded-bl-[12px]",
                 variant === "default" && "rounded-3xl",
-                hoverEffect && "hover:bg-slate-800/60 hover:border-white/20 hover:ring-white/10",
+                hoverEffect && "hover:bg-white/10 hover:border-white/20 hover:ring-white/10",
                 className
             )}
             {...props}

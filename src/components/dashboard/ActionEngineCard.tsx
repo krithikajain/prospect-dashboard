@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import type { DashboardData } from "@/types/dashboard";
-import { PlayCircle, Plus } from "lucide-react";
+import { Plus, Zap } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 
@@ -35,13 +35,13 @@ export function ActionEngineCard({ tasks, className, onCreateTask }: ActionEngin
     return (
         <GlassCard className={`p-6 flex flex-col h-full ${className}`} hoverEffect>
             <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3 text-indigo-400">
-                    <PlayCircle className="h-6 w-6" />
+                <div className="flex items-center gap-3">
+                    <div className="p-3 rounded-2xl bg-emerald-500/20 text-emerald-300">
+                        <Zap className="w-6 h-6" />
+                    </div>
                     <div>
-                        <h3 className="text-lg font-bold tracking-tight text-slate-100">Suggested Plays</h3>
-                        <p className="text-xs text-slate-400 font-medium uppercase tracking-wide">
-                            {doneCount} / {totalCount} Completed
-                        </p>
+                        <h3 className="text-xl font-bold text-white">Action Engine</h3>
+                        <p className="text-sm font-medium text-slate-200">Recommended next steps</p>
                     </div>
                 </div>
                 <Button size="sm" variant="outline" className="h-8 rounded-full border-indigo-500/30 text-indigo-300 hover:bg-indigo-500/20 bg-transparent" onClick={onCreateTask}>

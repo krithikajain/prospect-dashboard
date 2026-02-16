@@ -19,9 +19,9 @@ export function StakeholderCard({ stakeholders, className }: StakeholderCardProp
     return (
         <GlassCard className={`p-4 flex flex-col ${className}`} hoverEffect>
             <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2 text-slate-400">
+                <div className="flex items-center gap-2 text-white">
                     <Users className="w-4 h-4" />
-                    <h3 className="text-sm font-semibold uppercase tracking-wide">Stakeholders</h3>
+                    <h3 className="text-sm font-bold uppercase tracking-wide">Stakeholders</h3>
                 </div>
                 <Badge variant="outline" className="text-[10px] h-5 px-1.5 border-indigo-500/30 text-indigo-300 bg-indigo-500/10">
                     {stakeholders.length}
@@ -45,14 +45,14 @@ export function StakeholderCard({ stakeholders, className }: StakeholderCardProp
 
                         <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2">
-                                <p className="text-sm font-medium text-slate-200 truncate">
+                                <p className="text-sm font-bold text-white truncate">
                                     {s.name}
                                 </p>
                                 {s.influence === 'High' && (
                                     <Shield className="w-3 h-3 text-amber-400 shrink-0" />
                                 )}
                             </div>
-                            <p className="text-[10px] text-slate-400 truncate">{s.role}</p>
+                            <p className="text-[10px] text-slate-200 font-medium truncate">{s.role}</p>
                         </div>
                     </div>
                 ))}

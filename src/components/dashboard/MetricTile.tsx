@@ -26,15 +26,15 @@ export function MetricTile({ label, value, subValue, icon: Icon, trend, delay = 
                 className="h-full flex flex-col justify-between"
             >
                 <div className="flex justify-between items-start">
-                    <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">{label}</span>
-                    {Icon && <Icon className="w-4 h-4 text-indigo-400" />}
+                    <span className="text-[11px] font-extrabold text-slate-100 uppercase tracking-wider">{label}</span>
+                    {Icon && <Icon className="w-4 h-4 text-indigo-300" />}
                 </div>
 
                 <div className="mt-2">
-                    <div className="text-3xl font-bold text-slate-100 tracking-tight">{value}</div>
+                    <div className="text-3xl font-bold text-white tracking-tight">{value}</div>
                     {subValue && (
                         <div className="flex items-center gap-2 mt-1">
-                            <div className="text-xs text-slate-400 font-medium">{subValue}</div>
+                            <div className="text-xs text-slate-200 font-semibold">{subValue}</div>
                             {trend === 'up' && <span className="text-[10px] text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded-full">↑</span>}
                         </div>
                     )}

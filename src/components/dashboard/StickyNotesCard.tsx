@@ -59,9 +59,9 @@ export function StickyNotesCard({ className }: StickyNotesCardProps) {
     return (
         <GlassCard className={`p-4 ${className}`} hoverEffect>
             <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2 text-indigo-400">
+                <div className="flex items-center gap-2 text-indigo-200">
                     <StickyNote className="h-4 w-4" />
-                    <h3 className="text-xs font-bold uppercase tracking-wide">My Notes</h3>
+                    <h3 className="text-xs font-extra-bold uppercase tracking-wide text-white">My Notes</h3>
                 </div>
                 <Button
                     size="icon"
@@ -69,7 +69,7 @@ export function StickyNotesCard({ className }: StickyNotesCardProps) {
                     className="h-6 w-6 rounded-full hover:bg-white/10 -mr-1"
                     onClick={() => setIsAdding(true)}
                 >
-                    <Plus className="h-3 w-3 text-slate-400" />
+                    <Plus className="h-3 w-3 text-slate-300" />
                 </Button>
             </div>
 
@@ -150,7 +150,7 @@ export function StickyNotesCard({ className }: StickyNotesCardProps) {
                                     <Trash2 className="h-3 w-3" />
                                 </button>
                             </div>
-                            <div className="text-slate-200">{note.content}</div>
+                            <div className="text-white font-medium">{note.content}</div>
                         </motion.div>
                     ))}
                 </AnimatePresence>

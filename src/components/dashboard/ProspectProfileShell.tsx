@@ -7,19 +7,20 @@ interface ProspectProfileShellProps {
 
 export function ProspectProfileShell({ children }: ProspectProfileShellProps) {
     return (
-        <div className="min-h-screen bg-slate-950 font-sans text-slate-100 relative overflow-x-hidden selection:bg-indigo-500/30 selection:text-indigo-200">
-            {/* Background: Liquid Chrome */}
+        <div className="min-h-screen relative overflow-hidden font-sans text-white bg-[#4F6CA0] selection:bg-[#E5BE5B]/30 selection:text-white">
+            {/* Background: Liquid Chrome with SmartStory Colors */}
             <div className="fixed inset-0 z-0">
                 <LiquidChrome
-                    baseColor={[0.1, 0.1, 0.15]} // Deep metallic dark
+                    baseColor={[0.31, 0.42, 0.63]} // Smart Blue
+                    accentColor={[0.90, 0.75, 0.36]} // Metallic Gold
                     speed={0.2}
                     amplitude={0.4}
                     interactive={true}
-                    className="w-full h-full opacity-60" // Reduced opacity to blend with bg
+                    className="w-full h-full opacity-100"
                 />
             </div>
 
-            <main className="relative z-10 container mx-auto px-4 py-8 max-w-7xl">
+            <main className="relative z-10 container mx-auto px-4 py-8 max-w-[1600px]">
                 {children}
             </main>
         </div>
