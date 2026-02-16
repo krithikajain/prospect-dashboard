@@ -33,7 +33,7 @@ export function ActionEngineCard({ tasks, className, onCreateTask }: ActionEngin
     const hiddenCount = tasks.length - displayedTasks.length;
 
     return (
-        <GlassCard className={`p-6 flex flex-col h-full ${className}`} hoverEffect>
+        <GlassCard className={`p-4 flex flex-col h-full ${className}`} hoverEffect>
             <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
                     <div className="p-3 rounded-2xl bg-emerald-500/20 text-emerald-300">

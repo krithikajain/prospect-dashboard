@@ -198,7 +198,7 @@ export function InsightsCard({ data, industry, className }: InsightsCardProps) {
             : ["Adoption friction", "Change mgmt", "Integration", "Multi-team buy-in"].slice(0, 4);
 
     return (
-        <GlassCard className={`p-6 flex flex-col h-full ${className}`} hoverEffect>
+        <GlassCard className={`p-4 flex flex-col h-full ${className}`} hoverEffect>
             <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-bold text-white uppercase tracking-wide">
                     Strategic Signals

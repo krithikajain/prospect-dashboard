@@ -62,8 +62,8 @@ export function ReadinessCard({ data, className }: ReadinessCardProps) {
             </div>
 
             {/* Main Content: Chart */}
-            <div className="flex flex-col items-center justify-center p-2">
-                <div className="relative flex items-center justify-center w-[220px] h-[220px]">
+            <div className="flex flex-col items-center justify-center p-1">
+                <div className="relative flex items-center justify-center w-[180px] h-[180px]">
                     <ChartContainer
                         config={{
                             authority: { label: "Authority", color: "rgba(16, 185, 129, 0.9)" }, // emerald-500

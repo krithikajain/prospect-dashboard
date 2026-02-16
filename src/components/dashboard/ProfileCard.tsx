@@ -28,8 +28,9 @@ export function ProfileCard({
     return (
         <GlassCard
             className={`relative overflow-hidden flex flex-col items-center justify-center text-center 
-      min-h-[420px] px-10 py-12 ${className}`}
+      min-h-[300px] px-5 py-6 ${className}`}
             hoverEffect
+            variant="default"
         >
             {/* Subtle Background Glow */}
             <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/15 via-purple-500/5 to-transparent pointer-events-none" />

@@ -59,7 +59,7 @@ function App() {
                 <Navbar />
 
                 {/* Bento Grid Layout - Main Container */}
-                <div className="relative z-10 p-8 max-w-[1640px] mx-auto mt-6 mb-12 bg-gradient-to-r from-[#4F6CA0]/90 via-[#90A0C9]/85 to-[#E5BE5B]/80 rounded-[40px] border border-white/20 shadow-8xl space-y-8">
+                <div className="relative z-10 p-5 max-w-[1640px] mx-auto mt-2 mb-4 bg-gradient-to-r from-[#4F6CA0]/90 via-[#90A0C9]/85 to-[#E5BE5B]/80 rounded-[32px] border border-white/20 shadow-8xl space-y-4">
 
                     {/* Header Actions */}
                     <DashboardHeader
@@ -67,10 +67,10 @@ function App() {
                         onSendInvite={handleSendInvite}
                     />
 
-                    <div className="flex flex-col lg:flex-row gap-6 items-start">
+                    <div className="flex flex-col lg:flex-row gap-4 items-start">
 
                         {/* Left Column: Stacked (Profile + Readiness + Stakeholder) */}
-                        <div className="w-full lg:w-[320px] flex flex-col gap-6 shrink-0">
+                        <div className="w-full lg:w-[300px] flex flex-col gap-4 shrink-0">
                             <ProfileCard
                                 identity={data.identity}
                                 industry={data.industry_trends.industry}
@@ -82,10 +82,10 @@ function App() {
                         </div>
 
                         {/* Right Main Content */}
-                        <div className="flex-1 flex flex-col gap-6">
+                        <div className="flex-1 flex flex-col gap-4">
 
                             {/* Row 1: Metric Tiles (Bento Row) */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                                 {metrics.map((m, i) => (
                                     <MetricTile
                                         key={i}
@@ -99,12 +99,12 @@ function App() {
                             </div>
 
                             {/* Row 2: Strategic Insights */}
-                            <div className="grid grid-cols-1 lg:grid-cols-1 gap-6 min-h-[350px]">
+                            <div className="grid grid-cols-1 lg:grid-cols-1 gap-4 min-h-[280px]">
                                 <InsightsCard data={data.pain_urgency} industry={data.industry_trends} className="h-full" />
                             </div>
 
                             {/* Row 3: Action Engine + Sticky Notes */}
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 h-full">
                                 <ActionEngineCard
                                     tasks={data.action_engine.tasks}
                                     onCreateTask={handleCreateTask}

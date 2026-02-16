@@ -1,4 +1,4 @@
-import { Search, Bell, Menu, Sparkles } from 'lucide-react';
+import { Search, Bell, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -8,12 +8,11 @@ export function Navbar() {
             <div className="container mx-auto px-6 h-16 flex items-center justify-between max-w-[1600px]">
                 {/* Logo Area */}
                 <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20">
-                        <Sparkles className="w-4 h-4 text-indigo-400" />
-                    </div>
-                    <span className="font-semibold text-lg tracking-tight text-slate-100">
-                        Prospect<span className="text-indigo-400">Intel</span>
-                    </span>
+                    <img
+                        src="/assets/prospect-intel-logo.png"
+                        alt="ProspectIntel Logo"
+                        className="h-8 w-auto object-contain"
+                    />
                 </div>
 
                 {/* Center Search */}

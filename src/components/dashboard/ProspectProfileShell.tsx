@@ -20,7 +20,7 @@ export function ProspectProfileShell({ children }: ProspectProfileShellProps) {
                 />
             </div>
 
-            <main className="relative z-10 container mx-auto px-4 py-8 max-w-[1600px]">
+            <main className="relative z-10 container mx-auto px-4 pb-8 max-w-[1600px]">
                 {children}
             </main>
         </div>
