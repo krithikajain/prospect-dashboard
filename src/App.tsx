@@ -1,136 +1,45 @@
-import { ProspectProfileShell } from '@/components/dashboard/ProspectProfileShell';
-import { Navbar } from '@/components/dashboard/Navbar';
-import { ProfileCard } from '@/components/dashboard/ProfileCard';
-import { ReadinessCard } from '@/components/dashboard/ReadinessCard';
-import { ActionEngineCard } from '@/components/dashboard/ActionEngineCard';
-import { StakeholderCard } from '@/components/dashboard/StakeholderCard';
-import { InsightsCard } from '@/components/dashboard/InsightsCard';
-import { StickyNotesCard } from '@/components/dashboard/StickyNotesCard';
-import { MetricTile } from '@/components/dashboard/MetricTile';
-import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
+import { useState } from 'react';
 import { normalizeProspectData } from '@/lib/normalizer';
 import rawData from '@/data/studio_results_20260212_1512.json';
-import { Users, Building2, DollarSign } from 'lucide-react';
+import { Navbar, PageHeader, ProfileDropdown } from '@/components/layout';
+import { Stage0Home, Stage1Profile, Stage2Stakeholder, Stage4Need, Stage5Engagement, Stage6Timeline } from '@/components/stages';
 
-import { useState } from 'react';
+const STAGES = [
+    { id: 'home', label: 'Home', icon: 'home' },
+    { id: 'profile', label: 'Profile', icon: 'person' },
+    { id: 'power', label: 'Power', icon: 'groups' },
+    { id: 'pain', label: 'Pain', icon: 'target' },
+    { id: 'engagement', label: 'Engagement', icon: 'rocket_launch' },
+    { id: 'timeline', label: 'Timeline', icon: 'timeline' },
+] as const;
 
-function App() {
+export default function App() {
     const data = normalizeProspectData(rawData[0]);
-    const [tasks, setTasks] = useState(data.action_engine.tasks);
+    const [currentStage, setCurrentStage] = useState(0);
 
-    // Placeholder handlers
-    const handleAddNote = () => console.log('Add note');
-    const handleAddTask = (title: string) => {
-        const newTask = {
-            title,
-            priority: "High" as const, // Explicitly cast to allowed type
-        };
-        setTasks([newTask, ...tasks]);
+    const StageView = () => {
+        switch (currentStage) {
+            case 0: return <Stage0Home />;
+            case 1: return <Stage1Profile data={data} />;
+            case 2: return <Stage2Stakeholder data={data} />;
+            case 3: return <Stage4Need data={data} />;
+            case 4: return <Stage5Engagement data={data} />;
+            case 5: return <Stage6Timeline data={data} />;
+            default: return null;
+        }
     };
-    const handleSendInvite = () => console.log('Send Invite');
-
-    // Specific metrics for the Bento Grid
-    const metrics = [
-        {
-            label: "Active Users",
-            value: data.company_scale?.active_users || "N/A",
-            subValue: "Global Reach",
-            icon: Users
-        },
-        {
-            label: "Organizations",
-            value: data.company_scale?.organizations || "N/A",
-            subValue: "Enterprise Clients",
-            icon: Building2
-        },
-        {
-            label: "Previous Exit",
-            value: data.company_scale?.recent_exit || "N/A",
-            subValue: "Blackboard",
-            icon: DollarSign
-        },
-        {
-            label: "Funding",
-            value: data.company_scale?.funding || "$120M",
-            subValue: "Series C",
-            icon: DollarSign
-        },
-    ];
-
-    // Filter out N/A metrics if desired, or keep them to show gaps? 
-    // User said "clean all that". "N/A" is better than fake data.
-
 
     return (
-        <ProspectProfileShell>
-            <div className="space-y-2">
-                <Navbar />
+        <div className="h-screen w-full flex flex-col bg-[#F9FAFB] text-[#000000] font-sans overflow-hidden">
+            <Navbar stages={[...STAGES]} currentStage={currentStage} onStageChange={setCurrentStage} />
+            <ProfileDropdown />
 
-                {/* Bento Grid Layout - Main Container */}
-                <div className="relative z-10 p-5 max-w-[1640px] mx-auto mt-2 mb-4 bg-gradient-to-r from-[#4F6CA0]/40 via-[#90A0C9]/30 to-[#E5BE5B]/30 rounded-[32px] border border-white/20 shadow-8xl space-y-4 backdrop-blur-md">
-                    {/* Contrast Scrim */}
-                    <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/30 pointer-events-none rounded-[32px]" />
-
-                    {/* Header Actions */}
-                    <DashboardHeader
-                        onAddNote={handleAddNote}
-                        onSendInvite={handleSendInvite}
-                    />
-
-                    <div className="flex flex-col lg:flex-row gap-4 items-start">
-
-                        {/* Left Column: Stacked (Profile + Readiness + Stakeholder) */}
-                        <div className="w-full lg:w-[300px] flex flex-col gap-4 shrink-0">
-                            <ProfileCard
-                                identity={data.identity}
-                                industry={data.industry_trends.industry}
-                                website={data.identity.website}
-                                className="h-auto"
-                            />
-                            <ReadinessCard data={data} className="flex-1" />
-                            <StakeholderCard stakeholders={data.stakeholders} />
-                        </div>
-
-                        {/* Right Main Content */}
-                        <div className="flex-1 flex flex-col gap-4">
-
-                            {/* Row 1: Metric Tiles (Bento Row) */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                                {metrics.map((m, i) => (
-                                    <MetricTile
-                                        key={i}
-                                        label={m.label}
-                                        value={m.value}
-                                        subValue={m.subValue}
-                                        icon={m.icon}
-                                        delay={i * 0.1}
-                                    />
-                                ))}
-                            </div>
-
-                            {/* Row 2: Strategic Insights */}
-                            <div className="grid grid-cols-1 lg:grid-cols-1 gap-4 min-h-[280px]">
-                                <InsightsCard data={data.pain_urgency} industry={data.industry_trends} className="h-full" />
-                            </div>
-
-                            {/* Row 3: Action Engine + Sticky Notes */}
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 h-full">
-                                <ActionEngineCard
-                                    tasks={tasks}
-                                    onAddTask={handleAddTask}
-                                    className="h-full"
-                                />
-                                <StickyNotesCard
-                                    className="h-full"
-                                />
-                            </div>
-
-                        </div>
-                    </div>
+            <main className="flex-1 flex flex-col pt-24 px-12 pb-12 overflow-y-auto">
+                <div className="max-w-[1400px] mx-auto w-full">
+                    {currentStage !== 0 && <PageHeader label={STAGES[currentStage].label} />}
+                    <StageView />
                 </div>
-            </div>
-        </ProspectProfileShell>
+            </main>
+        </div>
     );
 }
-
-export default App;

@@ -1,47 +1,60 @@
-# Prospect Dashboard Architecture
+# Dashboard Architecture
 
-This project implements a "Stage Dashboard" pattern for the Prospecting stage.
-It is designed to be modular and extensible for other pipeline stages (Discovery, Evaluation, Decision, etc.).
+## Quick Reference: Where to Find Things
 
-## Directory Structure
+### To change navigation or app shell
+→ `src/components/layout/` — `Navbar.tsx`, `PageHeader.tsx`, `ProfileDropdown.tsx`
 
-- `src/components/dashboard`: Shared layout components (StageDashboardShell).
-- `src/components/cards`: Reusable widget cards.
-- `src/components/dialogs`: Action dialogs.
-- `src/lib/selectors`: Pure functions to map raw JSON -> UI models.
-- `src/types`: TypeScript definitions.
+### To change a specific card on a specific page
+→ `src/components/stages/{stage-folder}/{CardName}.tsx`
 
-## How to Add a New Stage (e.g., Discovery)
+| Page | Folder | Files |
+|------|--------|-------|
+| Home | `stages/` | `Stage0Home.tsx` |
+| Profile | `stages/profile/` | `ProfileCard`, `IcpScoreCard`, `OrganizationalFootprint`, `CompanyHealth`, `BusinessContext`, `ProfessionalJourney`, `profileScoring` |
+| Power | `stages/power/` | `PowerMetrics`, `AuthorityPath`, `BudgetLogic`, `StakeholdersInvolved`, `BuyingHistory` |
+| Pain (Authority) | `stages/pain/` | `SignaturePath`, `ShadowCommittee`, `ProcurementHistory`, `ForcingEvent`, `CapitalFlow`, `UrgencyDrivers` |
+| Need | `stages/need/` | `ProblemClarity`, `ImpactSeverity`, `NeedUrgencyDrivers`, `InternalFriction`, `PoliticalWeight` |
+| Engagement | `stages/` | `Stage5Engagement.tsx` |
+| Timeline | `stages/` | `Stage6Timeline.tsx` |
 
-1.  **Define Stage Data Requirements**:
-    - Update `src/types/prospectIntel.ts` if new fields are needed.
-    - Create new selectors in `src/lib/selectors` for stage-specific data.
+### To change a shared UI pattern (tag, metric box, etc.)
+→ `src/components/ui/`
 
-2.  **Create New Cards (if needed)**:
-    - If the "Discovery" stage needs a "Technical Requirements" card, create `src/components/cards/RequirementsCard.tsx`.
-    - Reuse existing cards (e.g., `StakeholderCard`, `NotesCard`) if they apply.
+| Component | What it replaces |
+|-----------|-----------------|
+| `MetricBox` | All stat tiles (Funding, Revenue, Active Users, etc.) |
+| `StatusTag` | All colored pill badges (High/Medium/Low, confidence tags) |
+| `InfoRow` | Icon + title + description rows (stakeholders, committee members) |
+| `ChecklistItem` | Check/unchecked urgency items |
+| `ScoreDisplay` | Large score numerics (ICP, Influence) |
+| `Card` / `CardHeader` | Every card wrapper |
 
-3.  **Assemble the Dashboard**:
-    - Duplicate `src/App.tsx` (or create a new route/page component).
-    - Swap out the cards in the Left/Right columns.
-    - Example:
-      ```tsx
-      <StageDashboardShell data={data} ...>
-        <div className="left-col">
-           <RequirementsCard data={data} />
-           <StakeholderCard data={data} />
-        </div>
-        <div className="right-col">
-           <NextStepsCard data={data} />
-        </div>
-      </StageDashboardShell>
-      ```
+### To change business logic (scoring, data normalization)
+→ `src/lib/normalizer.ts` — JSON → typed data
+→ `src/components/stages/profile/profileScoring.ts` — ICP/timing score calculation
 
-4.  **Configuration (Advanced)**:
-    - You can create a `stageConfig` object to dynamically render cards based on the current stage if you prefer a configuration-driven approach.
+### To change types
+→ `src/types/dashboard.ts`
 
-## Data Flow
+---
 
-- **Raw Data**: `ProspectIntel` JSON object.
-- **Selectors**: Transform raw data into simple props for cards (e.g., `getDecisionMakers(data)`).
-- **Persistence**: `src/lib/storage.ts` handles local persistence for Notes and Tasks. In a real app, replace this with API calls.
+## Architecture Principles
+
+1. **Orchestrator pattern**: Each Stage file (`Stage1Profile.tsx`, etc.) is a pure layout grid that imports and arranges sub-components. No logic, no markup beyond grid placement.
+
+2. **One card = one file**: Every visual card on the dashboard has its own file. File names match what the user sees.
+
+3. **Shared primitives**: Repeated patterns (`MetricBox`, `StatusTag`, `InfoRow`, `ChecklistItem`) live in `components/ui/` and are imported wherever needed.
+
+4. **Props down, no global state**: Data flows from `App.tsx` → Stage orchestrator → sub-components via props. No context providers or state management libraries.
+
+5. **< 100 lines per file**: No component file exceeds ~100 lines of code. If it does, it should be decomposed further.
+
+---
+
+## Tech Stack
+- **Framework**: React 19 + TypeScript (Vite)
+- **Styling**: Tailwind CSS
+- **Charts**: Recharts
+- **Fonts**: Inter (Google Fonts), Material Symbols

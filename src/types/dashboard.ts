@@ -26,14 +26,7 @@ export interface DashboardData {
         avatar?: string;
         influence: 'High' | 'Medium' | 'Low';
     }>;
-    qualification_framework: {
-        name: string;
-        criteria: Array<{
-            name: string;
-            status: 'Met' | 'Partial' | 'Missing';
-            notes: string;
-        }>;
-    };
+
     buying_process: {
         steps: Array<{
             name: string;
@@ -57,6 +50,10 @@ export interface DashboardData {
         pain_points: string[];
         timing_insights: string[];
         decision_drivers: string[];
+        urgency_level: 'High' | 'Medium' | 'Low';
+        business_impact: string;
+        impact_metrics: string[];
+        executive_visibility: string;
     };
     deal_strength: {
         score: number;
@@ -75,20 +72,34 @@ export interface DashboardData {
         growth_rate?: string;
         market_cap?: string;
     };
+    profile_fit: {
+        contact: {
+            role: string;
+            seniority: string;
+            functional_ownership: string;
+            tenure: string;
+            career_trajectory: string;
+            digital_footprint: string;
+            past_pedigree: string;
+        };
+        company: {
+            revenue_range: string;
+            geography: string;
+            growth_stage: string;
+            funding_status: string;
+            hiring_trend: string;
+            industry_context: string;
+        };
+        business: {
+            recent_news: string;
+            market_pressures: string;
+            digital_maturity: string;
+        };
+        output: {
+            icp_score: number;
+            timing_signal: string;
+        };
+    };
 }
 
-export interface Note {
-    id: string;
-    content: string;
-    timestamp: string;
-    author: string;
-    tags: string[];
-}
 
-export interface Task {
-    id: string;
-    title: string;
-    status: 'Todo' | 'In Progress' | 'Done';
-    assignee?: string;
-    dueDate?: string;
-}
