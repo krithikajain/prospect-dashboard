@@ -41,11 +41,7 @@ export function Stage1Profile({ data }: { data: DashboardData }) {
             <div className="col-span-1 xl:col-span-9 flex flex-col gap-4">
                 <OrganizationalFootprint />
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    <CompanyHealth
-                        revenueRange={pf?.company?.revenue_range}
-                        growthStage={pf?.company?.growth_stage}
-                        fundingStatus={pf?.company?.funding_status}
-                    />
+                    <CompanyHealth data={data} />
                     <BusinessContext
                         recentNews={pf?.business?.recent_news}
                         marketPressures={pf?.business?.market_pressures}

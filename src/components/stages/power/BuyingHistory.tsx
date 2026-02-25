@@ -1,44 +1,40 @@
 import { Card, CardHeader } from '@/components/ui/Card';
 
 /**
- * Buying Behavior History card showing past purchase patterns.
+ * Buying Behavior History card showing past purchase patterns and top investments.
  */
 export function BuyingHistory() {
     return (
-        <Card className="p-6 group hover:shadow-lg transition-all duration-300">
-            <CardHeader icon="history" title="4. Buying Behavior History" />
-            <div className="mt-4 space-y-4">
-                <HistoryBlock
-                    icon="shopping_bag"
-                    iconColor="text-blue-500"
-                    bgColor="bg-blue-50/50 border-blue-100/50"
-                    labelColor="text-blue-800/60"
-                    label="Bought Similar Tools?"
-                    text="Yes, history of large enterprise software deployments (e.g., Salesforce, Workday integrations)."
-                />
-                <HistoryBlock
-                    icon="hub"
-                    iconColor="text-emerald-500"
-                    bgColor="bg-emerald-50/50 border-emerald-100/50"
-                    labelColor="text-emerald-800/60"
-                    label="Purchasing Structure"
-                    text="Centralized. IT procurement dictates terms, but business units hold final vendor selection power."
-                />
+        <Card className="p-6 group hover:shadow-lg transition-all duration-300 flex flex-col h-full">
+            <CardHeader icon="history" title="4. Track Record & Past Investments" />
+
+            <div className="mt-2 flex-1 flex flex-col justify-between">
+                <div>
+                    <p className="text-[11px] text-gray-400 font-bold uppercase tracking-widest mb-4">Top 3 Enterprise Investments</p>
+                    <div className="relative min-h-[300px] w-full flex items-center justify-center p-4">
+
+                        {/* 1. Largest Bubble (Salesforce) */}
+                        <div className="absolute top-1/2 left-1/4 -translate-y-1/2 -translate-x-1/2 w-40 h-40 rounded-full bg-[#E0E2FF] flex flex-col items-center justify-center text-center shadow-sm hover:scale-105 transition-transform cursor-pointer border border-[#CCD0FF]">
+                            <span className="text-3xl font-light tracking-tight text-slate-800">$1.2M</span>
+                            <span className="text-[10px] font-semibold text-slate-600 mt-1 uppercase tracking-wider">Salesforce</span>
+                        </div>
+
+                        {/* 2. Medium Bubble (Workday) */}
+                        <div className="absolute top-[20%] right-[30%] -translate-x-1/2 w-28 h-28 rounded-full bg-[#FFF3D6] flex flex-col items-center justify-center text-center shadow-sm hover:scale-105 transition-transform cursor-pointer border border-[#FFE7A8]">
+                            <span className="text-xl font-light tracking-tight text-slate-800">$850k</span>
+                            <span className="text-[9px] font-semibold text-slate-600 mt-1 uppercase tracking-wider">Workday</span>
+                        </div>
+
+                        {/* 3. Smallest Bubble (Outreach) */}
+                        <div className="absolute bottom-[10%] right-[15%] w-24 h-24 rounded-full bg-[#E8EBFF] flex flex-col items-center justify-center text-center shadow-sm hover:scale-105 transition-transform cursor-pointer border border-[#D0D6FF]">
+                            <span className="text-lg font-light tracking-tight text-slate-800">$400k</span>
+                            <span className="text-[8px] font-semibold text-slate-600 mt-1 uppercase tracking-wider">Outreach.io</span>
+                        </div>
+
+                    </div>
+                </div>
+
             </div>
         </Card>
-    );
-}
-
-function HistoryBlock({ icon, iconColor, bgColor, labelColor, label, text }: {
-    icon: string; iconColor: string; bgColor: string; labelColor: string; label: string; text: string;
-}) {
-    return (
-        <div className={`${bgColor} border p-4 rounded-xl flex items-start gap-4`}>
-            <span className={`material-symbols-outlined ${iconColor} mt-0.5`}>{icon}</span>
-            <div>
-                <span className={`text-[11px] font-bold uppercase tracking-wider ${labelColor} block mb-0.5`}>{label}</span>
-                <span className="text-sm font-medium text-slate-800 leading-snug">{text}</span>
-            </div>
-        </div>
     );
 }

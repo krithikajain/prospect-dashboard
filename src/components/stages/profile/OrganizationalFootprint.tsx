@@ -9,10 +9,10 @@ export function OrganizationalFootprint() {
         <Card>
             <CardHeader icon="business" title="Organizational Footprint" />
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <MetricBox label="Funding" value="$120M" />
-                <MetricBox label="Organizations" value="1,500+" />
-                <MetricBox label="Active Users" value="10 M+" />
-                <MetricBox label="Recent Exit" value="$1.7 B" />
+                <MetricBox label="Funding" value="$120M" smallIcon="payments" />
+                <MetricBox label="Organizations" value="1,500+" smallIcon="corporate_fare" />
+                <MetricBox label="Active Users" value="10 M+" smallIcon="groups" />
+                <MetricBox label="Recent Exit" value="$1.7 B" smallIcon="moving" />
             </div>
         </Card>
     );

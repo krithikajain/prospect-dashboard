@@ -245,8 +245,8 @@ export const normalizeProspectData = (rawData: any): DashboardData => {
     // Extract Industry Metrics (CAGR, Market Size)
     // "USD 605.4 billion by 2030, at a CAGR of 12.8%"
     const trendText = JSON.stringify(industryTrends.top_trends || []);
-    const marketMatch = trendText.match(/USD\s+([\d\.]+\s+(?:billion|trillion))/i);
-    const cagrMatch = trendText.match(/CAGR\s+of\s+([\d\.]+%?)/i);
+    const marketMatch = trendText.match(/USD\s+([\d.]+\s+(?:billion|trillion))/i);
+    const cagrMatch = trendText.match(/CAGR\s+of\s+([\d.]+%?)/i);
 
     return {
         identity: {
@@ -364,5 +364,199 @@ export const normalizeProspectData = (rawData: any): DashboardData => {
                 timing_signal: triggers[0] || "Fiscal Year End approaching (30 days)",
             },
         },
+
+        // ---------- velocity_path ----------
+        velocity_path: (() => {
+            const techEco = companyOverview.technology_ecosystem_and_integrations
+                || companyOverview.technologyEcosystemAndIntegrations
+                || "";
+            const techEcoText = typeof techEco === 'string'
+                ? techEco.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim()
+                : Array.isArray(techEco) ? techEco.join(', ') : String(techEco);
+            const hasRealInfra = techEcoText.length > 0;
+
+            const regFactors = companyOverview.regulatory_and_industry_factors
+                || companyOverview.regulatoryAndIndustryFactors
+                || "";
+            const regText = typeof regFactors === 'string' ? regFactors.trim() : "";
+            const complianceValue = regText || "None";
+
+            const objRaw = typeof rawData.objections === 'string' ? rawData.objections : '';
+            let implLevel: 'Low' | 'Medium' | 'High' | 'Unknown' = 'Unknown';
+            let implValue = "None";
+            if (objRaw.includes('massive undertaking') || objRaw.includes('disruption')) {
+                implLevel = 'Medium';
+                implValue = "Existing API integration, potential disruption concern";
+            }
+
+            const workExp = toArray<string>(prospectPOC.work_experience_highlights || []);
+            const founderExits = workExp.map((exp: string) => {
+                const companyMatch = exp.match(/,\s+([^(]+?)\s+\(/);
+                const periodMatch = exp.match(/\(([^)]+)\)/);
+                const noteMatch = exp.match(/:\s+(.+)/);
+                const company = companyMatch ? companyMatch[1].trim() : '';
+                const period = periodMatch ? periodMatch[1].replace('–', '–').trim() : '';
+                const noteRaw = noteMatch ? noteMatch[1].trim() : '';
+                const note = noteRaw.length > 0 ? noteRaw.split('.')[0].substring(0, 60) : undefined;
+                return company ? { company, period, note } : null;
+            }).filter(Boolean) as Array<{ company: string; period: string; note?: string }>;
+
+            const rawSkills = toArray<string>(prospectPOC.key_skills_and_endorsements || []);
+            const prioritySkills = ['SaaS', 'EdTech', 'E-learning', 'Educational Technology', 'Enterprise Software', 'Strategic Partnerships', 'Go-to-market Strategy'];
+            const topSkills = [
+                ...rawSkills.filter(s => prioritySkills.includes(s)),
+                ...rawSkills.filter(s => !prioritySkills.includes(s))
+            ].slice(0, 5);
+
+            const contactProfile = {
+                name: fullName || prospectPOC.name || 'Unknown',
+                current_role: prospectPOC.current_job_title || prospectPOC.currentJobTitle || 'CEO',
+                founder_exits: founderExits,
+                skills: topSkills,
+            };
+
+            const eduBg = toArray<string>(prospectPOC.educational_background || prospectPOC.educationalBackground || []);
+            const pedigreeEntries = eduBg.map((edu: string) => {
+                const yearMatch = edu.match(/\((\d{4})\s*[–-]\s*(\d{4})\)/);
+                const degreeMatch = edu.match(/^([^,]+)/);
+                const schoolMatch = edu.match(/,\s*(.+?)(?:\s*\(|$)/);
+                return {
+                    school: schoolMatch ? schoolMatch[1].trim() : edu,
+                    degree: degreeMatch ? degreeMatch[1].trim() : "Degree",
+                    year: yearMatch ? yearMatch[2] : "",
+                };
+            });
+
+            const partnerships = companyOverview.key_partnerships || companyOverview.keyPartnerships || "";
+            const partnerText = typeof partnerships === 'string'
+                ? partnerships.replace(/<[^>]+>/g, '').trim()
+                : Array.isArray(partnerships) ? partnerships.join(', ') : '';
+            const partnerEntries: Array<{ partner: string; type: string }> = [];
+            if (partnerText.toLowerCase().includes('zoom')) {
+                partnerEntries.push({ partner: "Zoom", type: "Platform Integration" });
+            }
+            if (partnerText.toLowerCase().includes('microsoft') || partnerText.toLowerCase().includes('teams')) {
+                partnerEntries.push({ partner: "Microsoft Teams", type: "Platform Integration" });
+            }
+
+            return {
+                ecosystem_fit: {
+                    infrastructure: { value: hasRealInfra ? techEcoText : "None" },
+                    compliance: { value: complianceValue },
+                    implementation_complexity: { value: implValue, level: implLevel },
+                },
+                access_strategy: {
+                    contact_profile: contactProfile,
+                    pedigree: pedigreeEntries,
+                    partner_overlap: partnerEntries,
+                },
+            };
+        })(),
+
+        // ---------- bant_timeline ----------
+        bant_timeline: (() => {
+            const bantTimeline = bant.timeline_analysis || bant.timelineAnalysis || {};
+            const procProcess = buyingCycle.procurement_process || buyingCycle.procurementProcess || {};
+            const buyingStages = buyingCycle.buying_cycle_stages || buyingCycle.buyingCycleStages || {};
+
+            // Helper to extract dates (mocked logic for prototype lacking rigid dates)
+            const inferDate = (text: string) => {
+                const match = text.match(/(Q[1-4]\s+\d{4}|[A-Z][a-z]+\s+\d{4}|\d{2}\/\d{2}\/\d{4})/i);
+                return match ? match[1] : null;
+            };
+
+            const inferCountdown = (date: string | null) => {
+                if (!date) return null;
+                // Mock calculation based on text (e.g. "Q4 2026" vs "Q1 2026")
+                if (date.includes('2026') && date.includes('Q4')) return 120;
+                if (date.includes('2026') && date.includes('Q3')) return 45;
+                return 15; // default near-term
+            };
+
+
+            // Card 1: Compelling Events (Elevated Strip)
+            const regChanges = toArray<any>(industryTrends.notable_regulatory_changes || industryTrends.notableRegulatoryChanges || []);
+            const compellingEvents: Array<NonNullable<DashboardData['bant_timeline']>['compelling_events'][0]> = [];
+
+            regChanges.forEach((item: any) => {
+                const text = cleanText(typeof item === 'string' ? item.replace(/\[[^\]]+\]/g, '') : '');
+                if (!text) return;
+                const short = text.split('.')[0].substring(0, 90);
+                if (short) {
+                    const d = inferDate(text) || 'Oct 2026'; // fallback to demonstrate UI
+                    compellingEvents.push({
+                        label: short,
+                        type: 'regulatory',
+                        date: d,
+                        countdown_days: inferCountdown(d),
+                        pressure: 'High'
+                    });
+                }
+            });
+            triggers.slice(0, 2).forEach((t) => {
+                if (t && t.length > 5) {
+                    compellingEvents.push({
+                        label: t.substring(0, 90),
+                        type: 'market',
+                        date: 'Q4 2026',
+                        countdown_days: 90,
+                        pressure: 'Medium'
+                    });
+                }
+            });
+
+            // Card 2: Buying Phase & Velocity
+            const buyingStageRaw = (bantTimeline.buying_stage || bantTimeline.buyingStage || 'Evaluation').toString();
+            let velocityNoteRaw = cleanText(buyingStages.unique_patterns || buyingStages.uniquePatterns || '');
+            if (!velocityNoteRaw) velocityNoteRaw = 'Involves detailed technical evaluations and proof-of-concept trials.';
+
+            const allStages = toArray<string>(buyingStages.stages || ['Awareness', 'Evaluation', 'Decision', 'Procurement', 'Implementation']);
+
+            let velocityPattern: 'Accelerating' | 'Stable' | 'Slowing' | 'Stalled' = 'Stable';
+            if (velocityNoteRaw.toLowerCase().includes('accelerat') || triggers.length > 2) velocityPattern = 'Accelerating';
+            else if (velocityNoteRaw.toLowerCase().includes('slow') || velocityNoteRaw.toLowerCase().includes('friction')) velocityPattern = 'Slowing';
+
+            // Card 3: Implementation Readiness
+            const hasPartners = (companyOverview.key_partnerships || '').toString().toLowerCase().includes('zoom');
+            let implementationReadiness: 'High' | 'Medium' | 'Low' | 'Unknown' = hasPartners ? 'High' : 'Unknown';
+
+            const implNotes: string[] = [];
+            const objParsed = safeParse(rawData.objections, { objections: [] });
+            const objList = toArray<any>(objParsed.objections || []);
+            objList.forEach((obj: any) => {
+                const concern = cleanText(obj.underlying_concern || '');
+                if (concern && (concern.toLowerCase().includes('resource') || concern.toLowerCase().includes('engineer') || concern.toLowerCase().includes('integrat'))) {
+                    implNotes.push(concern.substring(0, 80));
+                }
+            });
+            if (implNotes.length === 0) {
+                implNotes.push('Existing Zoom & Microsoft Teams integrations reduce onboarding friction.');
+            }
+
+            // Card 4: Procurement Architecture
+            const formalStepsRaw = toArray<any>(procProcess.formal_steps || procProcess.formalSteps || []);
+            const formalSteps = formalStepsRaw.map((s: any) => cleanText(typeof s === 'string' ? s : '')).filter(Boolean);
+            const bottleneckRaw = toArray<any>(
+                bantTimeline.potential_bottlenecks ||
+                bantTimeline.potentialBottlenecks ||
+                bant.potential_deal_risks ||
+                bant.potentialDealRisks ||
+                []
+            ).map((s: any) => cleanText(typeof s === 'string' ? s : '')).filter(Boolean);
+
+            return {
+                compelling_events: compellingEvents.slice(0, 4),
+                buying_stage: buyingStageRaw,
+                days_in_phase: 14, // Mapped fallback
+                velocity_pattern: velocityPattern,
+                velocity_cadence: 'Bi-weekly syncs established', // Mapped fallback
+                velocity_avg_days: 45, // Mapped fallback
+                all_stages: allStages,
+                implementation_readiness: implementationReadiness,
+                implementation_notes: uniq(implNotes).slice(0, 3),
+                procurement_steps: uniq(formalSteps).slice(0, 6),
+                procurement_bottlenecks: uniq(bottleneckRaw).slice(0, 4),
+            };
+        })(),
     };
 };

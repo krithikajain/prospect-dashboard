@@ -24,7 +24,7 @@ export function AuthorityPath({ contactName }: AuthorityPathProps) {
                     <div className="relative z-10 flex items-center justify-between">
                         <div className="flex items-center gap-4">
                             <div className="w-12 h-12 rounded-full border-2 border-white bg-blue-50 text-blue-600 flex items-center justify-center shadow-md shrink-0">
-                                <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${contactName}`} alt="Contact" className="w-full h-full rounded-full" />
+                                <img src={`https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8Y2VvfGVufDB8fDB8fHww`} alt="Contact" className="w-full h-full rounded-full object-cover" />
                             </div>
                             <div>
                                 <p className="text-sm font-bold text-slate-800">{contactName}</p>

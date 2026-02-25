@@ -34,11 +34,15 @@ export function Stage2Stakeholder({ data }: { data: DashboardData }) {
                 championProbability={championProbability}
             />
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <AuthorityPath contactName={contactName} />
-                <BudgetLogic />
-                <StakeholdersInvolved />
-                <BuyingHistory />
+            <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
+                <div className="xl:col-span-5 flex flex-col gap-6">
+                    <AuthorityPath contactName={contactName} />
+                    <StakeholdersInvolved />
+                </div>
+                <div className="xl:col-span-7 flex flex-col gap-6">
+                    <BudgetLogic />
+                    <BuyingHistory />
+                </div>
             </div>
         </div>
     );

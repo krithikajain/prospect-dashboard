@@ -6,7 +6,7 @@ import { Card, CardHeader } from '@/components/ui/Card';
 export function BudgetLogic() {
     return (
         <Card className="p-6 group hover:shadow-lg transition-all duration-300">
-            <CardHeader icon="account_balance_wallet" title="2. The Budget Logic" />
+            <CardHeader icon="account_balance_wallet" title="3. The Budget Logic" />
             <div className="mt-8 space-y-8">
                 <div className="flex justify-between items-center border-b border-gray-100 pb-4">
                     <div>

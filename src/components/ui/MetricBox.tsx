@@ -6,6 +6,7 @@ interface MetricBoxProps {
     trend?: { direction: 'up' | 'down'; label: string };
     chart?: React.ReactNode;
     icon?: string;
+    smallIcon?: string;
     className?: string;
 }
 
@@ -13,11 +14,14 @@ interface MetricBoxProps {
  * A stat tile showing a label, a big value, an optional trend badge,
  * and an optional background chart or decorative icon.
  */
-export function MetricBox({ label, value, trend, chart, icon, className = '' }: MetricBoxProps) {
+export function MetricBox({ label, value, trend, chart, icon, smallIcon, className = '' }: MetricBoxProps) {
     return (
         <div className={`bg-gray-50/80 border border-gray-100 rounded-2xl p-4 flex flex-col shadow-sm relative overflow-hidden ${className}`}>
-            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-2 relative z-10 w-full flex justify-between">
-                <span>{label}</span>
+            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-2 relative z-10 w-full flex justify-between items-center">
+                <span className="flex items-center gap-1.5 flex-1 truncate">
+                    {smallIcon && <span className="material-symbols-outlined text-[13px] leading-none shrink-0 text-gray-400">{smallIcon}</span>}
+                    <span className="truncate">{label}</span>
+                </span>
                 {trend && (
                     <span className={`text-[9px] font-bold tracking-tight flex items-center ${trend.direction === 'up' ? 'text-emerald-500' : 'text-red-500'}`}>
                         <span className="material-symbols-outlined text-[10px] pr-0.5 mt-px">

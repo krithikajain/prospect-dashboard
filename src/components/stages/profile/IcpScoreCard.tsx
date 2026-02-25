@@ -20,8 +20,14 @@ export function IcpScoreCard({ score }: IcpScoreCardProps) {
 
     return (
         <Card className={`flex flex-col shrink-0 p-6 pt-5 min-h-[160px] border shadow-sm transition-colors duration-300 ${bgStyle}`}>
-            <div className="flex justify-between items-center mb-3">
+            <div className="flex justify-between items-center mb-1">
                 <p className="text-xs font-bold text-gray-500 tracking-[0.15em] uppercase">ICP Fit Score</p>
+                <StatusTag
+                    label={`${confidence} Confidence`}
+                    variant={variant as any}
+                    icon="auto_awesome"
+                    className="h-fit"
+                />
             </div>
 
             <div className="flex flex-wrap items-center justify-between gap-4 mb-4 relative z-10 w-full">
@@ -38,12 +44,6 @@ export function IcpScoreCard({ score }: IcpScoreCardProps) {
                             </div>
                         </>
                     }
-                />
-                <StatusTag
-                    label={`${confidence} Confidence`}
-                    variant={variant as any}
-                    icon="auto_awesome"
-                    className="h-fit"
                 />
             </div>
 

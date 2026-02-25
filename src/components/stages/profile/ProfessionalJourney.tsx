@@ -1,30 +1,15 @@
 import { useState } from 'react';
 import { Card } from '@/components/ui/Card';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 
 const careerData = [
-    { year: '2013', role: 'SDR', company: 'Oracle', level: 30 },
-    { year: '2014', role: 'Account Exec', company: 'Okta', level: 15 },
-    { year: '2015', role: 'Mid-Market AE', company: 'Okta', level: 45 },
-    { year: '2016', role: 'Director of Sales', company: 'Salesforce', level: 25 },
-    { year: '2017', role: 'VP of Sales', company: 'Salesforce', level: 55 },
-    { year: '2019', role: 'CRO', company: 'Tech Inc', level: 85 },
-    { year: '2020', role: 'Founder & CEO', company: 'Acme Corp', level: 50 },
+    { year: '2020 - Present', role: 'CEO', company: 'Acme Corp', isCurrent: true },
+    { year: '2019 - 2020', role: 'CRO', company: 'Tech Inc' },
+    { year: '2017 - 2019', role: 'VP Sales', company: 'Salesforce' },
+    { year: '2016 - 2017', role: 'Director', company: 'Salesforce' },
+    { year: '2015 - 2016', role: 'Mid-Market AE', company: 'Okta' },
+    { year: '2014 - 2015', role: 'Account Exec', company: 'Okta' },
+    { year: '2013 - 2014', role: 'SDR', company: 'Oracle' },
 ];
-
-const CareerTooltip = ({ active, payload }: any) => {
-    if (active && payload?.length) {
-        const d = payload[0].payload;
-        return (
-            <div className="bg-white/95 backdrop-blur-md p-3.5 rounded-xl shadow-xl flex flex-col min-w-[140px] border border-[#D0D6F0] relative z-50 transform -translate-y-4">
-                <p className="text-[10px] font-bold text-[#6B6DCD]/80 tracking-widest uppercase mb-1">{d.company}</p>
-                <p className="text-sm font-extrabold text-[#5356A4] tracking-tight">{d.role}</p>
-                <p className="text-[11px] font-medium text-[#6B6DCD]/90 mt-1">{d.year}</p>
-            </div>
-        );
-    }
-    return null;
-};
 
 /**
  * Professional Journey card with Workspace (career chart) and Education tabs.
@@ -65,30 +50,46 @@ export function ProfessionalJourney() {
 
 function WorkspaceTab() {
     return (
-        <div className="w-full -ml-3 mt-4 relative z-10 min-h-[170px] h-[200px] animate-in fade-in slide-in-from-bottom-2 duration-500">
-            <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={careerData} margin={{ top: 25, right: 10, left: 10, bottom: 0 }}>
-                    <defs>
-                        <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-                            <feDropShadow dx="0" dy="5" stdDeviation="4" floodColor="#94a3b8" floodOpacity="0.15" />
-                        </filter>
-                    </defs>
-                    <CartesianGrid vertical={true} horizontal={false} stroke="#f1f5f9" strokeWidth={1.5} />
-                    <XAxis dataKey="year" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 500 }} tickMargin={12} />
-                    <YAxis hide={true} domain={[0, 100]} />
-                    <RechartsTooltip content={<CareerTooltip />} cursor={{ stroke: '#cbd5e1', strokeWidth: 1.5, strokeDasharray: '4 4', opacity: 0.5 }} />
-                    <Line
-                        type="monotone"
-                        dataKey="level"
-                        stroke="#334155"
-                        strokeWidth={3}
-                        dot={{ r: 5, fill: '#334155', stroke: '#ffffff', strokeWidth: 2 }}
-                        activeDot={{ r: 7, fill: '#0f172a', stroke: '#FFF', strokeWidth: 3 }}
-                        filter="url(#shadow)"
-                        animationDuration={1000}
-                    />
-                </LineChart>
-            </ResponsiveContainer>
+        <div className="w-full flex-1 relative z-10 flex flex-col justify-center animate-in fade-in slide-in-from-bottom-2 duration-500 px-2 mt-4 pb-2">
+            <div className="relative flex justify-between items-center w-full">
+                {/* Connecting Horizontal Line */}
+                <div className="absolute left-[5%] right-[5%] top-1/2 -translate-y-1/2 h-0.5 bg-slate-100 z-0"></div>
+
+                {careerData.map((item, idx) => (
+                    <div key={idx} className="relative z-10 flex flex-col items-center group flex-1 cursor-pointer">
+
+                        {/* Hover Year Tooltip */}
+                        <div className="absolute bottom-full mb-10 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 pointer-events-none z-50">
+                            <div className="bg-slate-800 text-white text-[10px] font-bold px-2.5 py-1 rounded shadow-lg whitespace-nowrap flex items-center gap-1">
+                                <span className="material-symbols-outlined text-[12px] text-blue-400">history</span>
+                                {item.year}
+                            </div>
+                            <div className="w-2 h-2 bg-slate-800 rotate-45 absolute -bottom-1 left-1/2 -translate-x-1/2"></div>
+                        </div>
+
+                        {/* Top: Role */}
+                        <div className="absolute bottom-full mb-3 text-center w-full px-0.5">
+                            <h4 className={`text-[10px] font-bold leading-tight transition-colors ${item.isCurrent ? 'text-blue-600' : 'text-slate-700 group-hover:text-blue-600'}`}>
+                                {item.role}
+                            </h4>
+                        </div>
+
+                        {/* Timeline Node */}
+                        <div className={`w-3.5 h-3.5 mt-2 rounded-full border-2 transition-all duration-300 relative z-10 ${item.isCurrent ? 'bg-blue-500 border-blue-200 shadow-md scale-110' : 'bg-slate-200 border-white shadow-sm group-hover:bg-blue-400 group-hover:scale-125'}`}>
+                            {item.isCurrent && (
+                                <div className="absolute inset-0 rounded-full animate-ping bg-blue-400 opacity-20"></div>
+                            )}
+                        </div>
+
+                        {/* Bottom: Company */}
+                        <div className="absolute top-full mt-3 text-center w-full px-0.5">
+                            <p className={`text-[10px] transition-colors ${item.isCurrent ? 'font-bold text-slate-800' : 'font-medium text-gray-500 group-hover:text-slate-800'}`}>
+                                {item.company}
+                            </p>
+                        </div>
+                    </div>
+                ))}
+            </div>
         </div>
     );
 }

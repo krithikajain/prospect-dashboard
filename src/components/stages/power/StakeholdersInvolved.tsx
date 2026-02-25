@@ -7,7 +7,7 @@ import { InfoRow } from '@/components/ui/InfoRow';
 export function StakeholdersInvolved() {
     return (
         <Card className="p-6 group hover:shadow-lg transition-all duration-300">
-            <CardHeader icon="groups" title="3. Stakeholders Involved" />
+            <CardHeader icon="groups" title="2. Stakeholders Involved" />
             <div className="mt-4 flex flex-col gap-4">
                 <InfoRow
                     icon="gavel"

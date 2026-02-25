@@ -60,7 +60,7 @@ function FrontFace({ name, company, role, functionalOwnership, personalityTags, 
 }) {
     return (
         <div className={`absolute inset-0 backface-hidden w-full h-full flex flex-col justify-end transition-opacity duration-300 ${isFlipped ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-auto'}`}>
-            <img alt={name} className="absolute inset-0 w-full h-full object-cover object-top" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=800&q=80" />
+            <img alt={name} className="absolute inset-0 w-full h-full object-cover object-top" src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8Y2VvfGVufDB8fDB8fHww" />
             <div className="absolute inset-x-0 bottom-0 h-full bg-gradient-to-t from-[#161616] via-[#161616]/40 to-transparent" />
             <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-[#161616] to-transparent" />
 

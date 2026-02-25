@@ -1,73 +1,115 @@
-# React + TypeScript + Vite
+# Prospect Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A **sales intelligence dashboard** that transforms raw prospect data into actionable insights across multiple analysis stages. Built for sales reps who need to quickly assess prospect fit, authority, budget, pain points, and deal velocity — all in one place.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Quick Start
 
-## React Compiler
+```bash
+# Install dependencies
+npm install
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+# Run development server
+npm run dev
 
-## Expanding the ESLint configuration
+# Build for production
+npm run build
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Preview production build
+npm run preview
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 🛠 Tech Stack
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+| Layer          | Technology                                              |
+| -------------- | ------------------------------------------------------- |
+| **Framework**  | React 19 + TypeScript                                   |
+| **Bundler**    | Vite 7                                                  |
+| **Styling**    | Tailwind CSS 3.4 + custom CSS                           |
+| **Charts**     | Recharts 3.7                                            |
+| **Animations** | Framer Motion 12 · GSAP 3.14                            |
+| **UI Primitives** | Radix UI (Avatar, Dialog, Tabs, Tooltip, Dropdown…)  |
+| **Icons**      | Material Symbols Outlined · Lucide React                |
+| **Fonts**      | Inter (Google Fonts)                                    |
+| **Forms**      | React Hook Form + Zod validation                        |
+| **Utilities**  | clsx · tailwind-merge · class-variance-authority (CVA)  |
+
+---
+
+## 📐 Architecture Overview
+
+The dashboard follows a **stage-based navigation** model:
+
 ```
+┌─────────────────────────────────────────────────────────┐
+│  Navbar  (pill-based section switching)                  │
+├─────────────────────────────────────────────────────────┤
+│  Folder Tabs  (sub-tabs within a section)               │
+├─────────────────────────────────────────────────────────┤
+│                                                         │
+│   ┌──────────────────────────────────────────────┐      │
+│   │  PageHeader  (breadcrumb + title)            │      │
+│   ├──────────────────────────────────────────────┤      │
+│   │                                              │      │
+│   │  Stage View                                  │      │
+│   │  (bento grid of cards)                       │      │
+│   │                                              │      │
+│   └──────────────────────────────────────────────┘      │
+│                                                         │
+└─────────────────────────────────────────────────────────┘
+```
+
+### Navigation Sections
+
+| Section         | Tabs                               | Purpose                                   |
+| --------------- | ---------------------------------- | ----------------------------------------- |
+| **Home**        | —                                  | Landing / overview                        |
+| **Prospect**    | Profile · Power · Pain · Path      | Deep-dive into the prospect entity        |
+| **Qualification** | Budget · Authority · Need · Timeline | BANT analysis framework               |
+| **Need**        | —                                  | Need analysis (placeholder)               |
+| **Proposition** | Timeline                           | Value proposition & timeline              |
+
+### Core Patterns
+
+1. **Orchestrator →  Cards**: Each tab renders a `Stage*` component that acts as a pure layout grid, importing and arranging smaller card components.
+2. **Shared UI Primitives**: Repeated patterns (`MetricBox`, `StatusTag`, `InfoRow`, etc.) live in `components/ui/` and are imported everywhere.
+3. **Props-down data flow**: `App.tsx` normalizes JSON → passes typed data to stage orchestrators → sub-cards. No global state.
+4. **< 100 lines per file**: Every component stays small and focused.
+
+---
+
+## 📂 Project Structure
+
+See [FOLDER.md](./FOLDER.md) for a detailed breakdown of every directory and file.
+
+---
+
+## 🎨 Design System
+
+See [COLORS_UX.md](./COLORS_UX.md) for the full color palette, typography, spacing tokens, and component styling reference.
+
+---
+
+## 📏 Code Rules
+
+See [RULES.md](./RULES.md) for the instructions and conventions followed when generating code for this project.
+
+---
+
+## 📄 Other Docs
+
+| File                                                   | Description                                    |
+| ------------------------------------------------------ | ---------------------------------------------- |
+| [DASHBOARD_ARCHITECTURE.md](./DASHBOARD_ARCHITECTURE.md) | High-level system design & quick-reference map |
+| [FOLDER.md](./FOLDER.md)                               | Full folder tree with reusability notes        |
+| [COLORS_UX.md](./COLORS_UX.md)                        | Colors, fonts, and styling tokens              |
+| [RULES.md](./RULES.md)                                | Code generation rules & conventions            |
+
+---
+
+## License
+
+Private — internal use only.

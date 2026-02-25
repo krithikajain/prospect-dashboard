@@ -30,6 +30,62 @@
   padding: 8px 20px;
 }
 
+.folder-tab {
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #64748b;
+  background: transparent;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  position: relative;
+  transition: all 0.2s;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  border: none;
+  margin-right: 4px;
+  /* Space between tabs */
+  padding-bottom: 16px;
+  /* Extra padding at bottom to merge */
+}
+
+.folder-tab:hover:not(.folder-tab-active) {
+  color: #0f172a;
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.folder-tab-active {
+  background: #ffffff;
+  color: #0f172a;
+  z-index: 30;
+}
+
+/* Connect the active tab to the content below and add inverted corners */
+.folder-tab-active::before,
+.folder-tab-active::after {
+  content: '';
+  position: absolute;
+  bottom: 0px;
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+}
+
+.folder-tab-active::before {
+  left: -20px;
+  border-bottom-right-radius: 20px;
+  box-shadow: 10px 0 0 0 #ffffff;
+}
+
+.folder-tab-active::after {
+  right: -20px;
+  border-bottom-left-radius: 20px;
+  box-shadow: -10px 0 0 0 #ffffff;
+}
+
 .trend-pill-up {
   background: #E6F4EA;
   color: #1E7E34;
