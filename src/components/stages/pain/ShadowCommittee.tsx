@@ -1,5 +1,6 @@
 import { Card, CardHeader } from '@/components/ui/Card';
 import { InfoRow } from '@/components/ui/InfoRow';
+import { iconVariants } from '@/lib/theme';
 
 interface ShadowCommitteeProps {
     role: string;
@@ -16,9 +17,9 @@ export function ShadowCommittee({ role }: ShadowCommitteeProps) {
                 Based on {role} historically, expect these cross-functional roles to inevitably weigh in.
             </p>
             <div className="flex flex-col gap-3">
-                <InfoRow icon="gavel" iconColor="bg-indigo-50 text-indigo-500" title="Legal & Compliance" description="Expected friction: High" />
-                <InfoRow icon="shield_person" iconColor="bg-emerald-50 text-emerald-500" title="IT Security Operations" description="Requires SOC2 / ISO validation" />
-                <InfoRow icon="request_quote" iconColor="bg-amber-50 text-amber-500" title="Procurement Desk" description="Standard vendor onboarding" />
+                <InfoRow icon="gavel" iconColor={iconVariants.purple} title="Legal & Compliance" description="Expected friction: High" />
+                <InfoRow icon="shield_person" iconColor={iconVariants.emerald} title="IT Security Operations" description="Requires SOC2 / ISO validation" />
+                <InfoRow icon="request_quote" iconColor={iconVariants.amber} title="Procurement Desk" description="Standard vendor onboarding" />
             </div>
         </Card>
     );

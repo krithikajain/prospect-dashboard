@@ -1,4 +1,5 @@
 import { Card, CardHeader } from '@/components/ui/Card';
+import { iconVariants, type StatusVariant } from '@/lib/theme';
 
 /**
  * Emotional & Political Weight card — who suffers, career upside, risk of failure.
@@ -10,15 +11,16 @@ export function PoliticalWeight() {
             <p className="text-[11px] font-medium text-gray-400 mb-4 px-1">Personal Stakes</p>
 
             <div className="flex flex-col gap-4">
-                <StakeRow icon="person_alert" iconColor="bg-blue-50 text-blue-500 border-blue-100/50" label="Who Suffers?" value="VP of Sales & RevOps (Missed quotas)" />
-                <StakeRow icon="moving" iconColor="bg-emerald-50 text-emerald-500 border-emerald-100/50" label="Career Upside" value="Direct path to promotion for the internal champion." />
-                <StakeRow icon="warning" iconColor="bg-red-50 text-red-500 border-red-100/50" label="Risk of Failure" value="Loss of board confidence if Q4 targets are missed." />
+                <StakeRow icon="person_alert" iconTheme="blue" label="Who Suffers?" value="VP of Sales & RevOps (Missed quotas)" />
+                <StakeRow icon="moving" iconTheme="emerald" label="Career Upside" value="Direct path to promotion for the internal champion." />
+                <StakeRow icon="warning" iconTheme="red" label="Risk of Failure" value="Loss of board confidence if Q4 targets are missed." />
             </div>
         </Card>
     );
 }
 
-function StakeRow({ icon, iconColor, label, value }: { icon: string; iconColor: string; label: string; value: string }) {
+function StakeRow({ icon, iconTheme, label, value }: { icon: string; iconTheme: StatusVariant; label: string; value: string }) {
+    const iconColor = iconVariants[iconTheme] || iconVariants.slate;
     return (
         <div className="flex items-start gap-3">
             <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 border ${iconColor}`}>

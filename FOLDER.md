@@ -169,6 +169,18 @@ These files are **routers/layouts** — they import card components and arrange 
 | `BudgetTrends.tsx`        | Budget trend charts                            |
 | `BudgetSynthesis.tsx`     | Budget synthesis / summary                     |
 | `AuthorityDeepDive.tsx`   | Authority tab — decision rights & stakeholders |
+| `TimelineDeepDive.tsx`    | Timeline tab orchestrator                      |
+
+---
+
+#### `stages/qualification/timeline/` — Timeline & Compelling Events Cards
+
+| File                        | Purpose                                        |
+| --------------------------- | ---------------------------------------------- |
+| `BuyingPhaseAndVelocity.tsx`| Buying phase and velocity metrics              |
+| `CompellingEventsStrip.tsx` | Compelling events indicator row                |
+| `ImplementationReadiness.tsx`| Implementation readiness gauge                 |
+| `ProcurementArchitecture.tsx`| Step-by-step procurement visualization         |
 
 ---
 

@@ -5,7 +5,7 @@ import type { DashboardData } from '@/types/dashboard';
  * Evaluates the five strict categories for BANT Need qualification.
  */
 
-export interface NeedEvaluation {
+interface NeedEvaluation {
     corePain: {
         impact: string;
         metrics: string[];

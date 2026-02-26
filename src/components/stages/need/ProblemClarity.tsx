@@ -1,4 +1,5 @@
 import { Card, CardHeader } from '@/components/ui/Card';
+import { themeVariants } from '@/lib/theme';
 
 interface ProblemClarityProps {
     firstPainPoint?: string;
@@ -17,7 +18,7 @@ export function ProblemClarity({ firstPainPoint }: ProblemClarityProps) {
                     <QuestionBlock label="Who experiences it?" value="Sales Enablement & RevOps" small />
                     <QuestionBlock label="How long has it existed?" value="9+ Months" small />
                 </div>
-                <div className="bg-amber-50 border border-amber-100 p-3 rounded-xl mt-auto">
+                <div className={`${themeVariants.amber} p-3 rounded-xl mt-auto`}>
                     <p className="text-[10px] font-bold uppercase tracking-wider text-amber-600 mb-1">Why didn't past attempts work?</p>
                     <p className="text-xs font-medium text-amber-800 leading-snug">Legacy band-aid solutions lacked centralized data integration across the GTM stack.</p>
                 </div>

@@ -1,7 +1,8 @@
 import { Card, CardHeader } from '@/components/ui/Card';
 import type { DashboardData } from '@/types/dashboard';
 import { evaluateNeed } from '@/lib/domain/needEvaluation';
-
+import { StatusTag } from '@/components/ui/StatusTag';
+import { themeVariants, type StatusVariant } from '@/lib/theme';
 /**
  * Need Deep Dive — BANT Qualification (N).
  * Signal-board layout mapping the 5 Core Categories.
@@ -64,9 +65,7 @@ function StrategicMandates({ urgencyLevel, drivers }: { urgencyLevel: string; dr
 
             <div className="flex items-center justify-between mb-4 bg-slate-50 border border-slate-100 p-3 rounded-xl">
                 <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Urgency Level</span>
-                <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${isHigh ? 'bg-amber-100 text-amber-700' : 'bg-slate-200 text-slate-600'}`}>
-                    {urgencyLevel}
-                </span>
+                <StatusTag label={urgencyLevel} variant={isHigh ? 'amber' : 'slate'} />
             </div>
 
             <div className="flex flex-col gap-2 mt-auto">
@@ -157,10 +156,11 @@ function ExecutiveVisibility({ visibility }: { visibility: string }) {
 /* ── Shared Primitives ──────────────────────────────────── */
 
 function SignalRow({ label, value, icon, variant }: {
-    label: string; value: string; icon: string; variant: 'emerald' | 'amber' | 'red' | 'gray';
+    label: string; value: string; icon: string; variant: StatusVariant;
 }) {
-    const dotColor = { emerald: 'bg-emerald-400', amber: 'bg-amber-400', red: 'bg-red-400', gray: 'bg-slate-300' }[variant];
-    const valColor = { emerald: 'text-emerald-700', amber: 'text-amber-700', red: 'text-red-600', gray: 'text-slate-600' }[variant];
+    const activeTheme = themeVariants[variant] || themeVariants.slate;
+    const dotColor = activeTheme.split(' ').find(c => c.startsWith('bg-'))?.replace('bg-', 'bg-') || 'bg-slate-400';
+    const valColor = activeTheme.split(' ').find(c => c.startsWith('text-')) || 'text-slate-600';
     return (
         <div className="flex items-center gap-2.5 py-1.5 border-b border-slate-50 last:border-b-0">
             <span className="material-symbols-outlined text-[14px] text-slate-400 shrink-0">{icon}</span>

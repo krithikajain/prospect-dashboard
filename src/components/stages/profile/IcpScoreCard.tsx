@@ -1,21 +1,23 @@
 import { Card } from '@/components/ui/Card';
 import { ScoreDisplay } from '@/components/ui/ScoreDisplay';
 import { StatusTag } from '@/components/ui/StatusTag';
+import { glassVariants, type StatusVariant } from '@/lib/theme';
 
 interface IcpScoreCardProps {
     score: number;
+    breakdown?: { label: string; delta: number }[];
+    confidence?: "High" | "Medium" | "Low";
 }
 
 /**
  * Displays the ICP Fit Score with confidence badge, hover tooltip, and factor pills.
  */
-export function IcpScoreCard({ score }: IcpScoreCardProps) {
-    const confidence = score >= 80 ? 'High' : score >= 60 ? 'Medium' : 'Low';
+export function IcpScoreCard({ score, breakdown = [], confidence = "Medium" }: IcpScoreCardProps) {
     const variant = score >= 80 ? 'emerald' : score >= 60 ? 'amber' : 'gray';
     const bgStyle = score >= 80
-        ? 'bg-emerald-50/40 border-emerald-100/50'
+        ? glassVariants.emerald
         : score >= 60
-            ? 'bg-amber-50/40 border-amber-100/50'
+            ? glassVariants.amber
             : 'bg-white';
 
     return (
@@ -24,7 +26,7 @@ export function IcpScoreCard({ score }: IcpScoreCardProps) {
                 <p className="text-xs font-bold text-gray-500 tracking-[0.15em] uppercase">ICP Fit Score</p>
                 <StatusTag
                     label={`${confidence} Confidence`}
-                    variant={variant as any}
+                    variant={variant as StatusVariant}
                     icon="auto_awesome"
                     className="h-fit"
                 />
@@ -37,19 +39,38 @@ export function IcpScoreCard({ score }: IcpScoreCardProps) {
                         <>
                             <div className="font-semibold text-white text-sm mb-2 pb-2 border-b border-gray-700">Calculation Logic</div>
                             <div className="space-y-1.5 font-medium">
-                                <div className="flex justify-between"><span>Base:</span> <span className="text-white">50</span></div>
-                                <div className="flex justify-between"><span>Target Industry SaaS:</span> <span className="text-emerald-400">+15</span></div>
-                                <div className="flex justify-between"><span>Enterprise Size:</span> <span className="text-emerald-400">+15</span></div>
-                                <div className="flex justify-between"><span>Executive Authority:</span> <span className="text-blue-400">+20</span></div>
+                                {breakdown.length === 0 ? (
+                                    <div className="text-gray-400 text-xs italic">No data factors matched.</div>
+                                ) : (
+                                    breakdown.map((item, idx) => (
+                                        <div key={idx} className="flex justify-between gap-4">
+                                            <span>{item.label}:</span>
+                                            <span className="text-emerald-400">+{item.delta}</span>
+                                        </div>
+                                    ))
+                                )}
                             </div>
                         </>
                     }
                 />
             </div>
 
-            <div className="flex items-center gap-2 mt-auto">
-                <StatusTag label="Industry" variant="blue" icon="domain" />
-                <StatusTag label="Seniority" variant="purple" icon="person" />
+            <div className="flex flex-wrap items-center gap-2 mt-auto">
+                {breakdown.length > 0 ? (
+                    [...breakdown]
+                        .sort((a, b) => b.delta - a.delta)
+                        .slice(0, 2)
+                        .map((item, idx) => (
+                            <StatusTag
+                                key={idx}
+                                label={item.label}
+                                variant={idx === 0 ? "blue" : "purple"}
+                                icon={idx === 0 ? "stars" : "check"}
+                            />
+                        ))
+                ) : (
+                    <StatusTag label="Needs More Data" variant="gray" icon="hourglass_empty" />
+                )}
             </div>
         </Card>
     );

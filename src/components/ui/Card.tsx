@@ -1,6 +1,6 @@
 import * as React from "react"
 
-export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
     padding?: 'sm' | 'md' | 'lg' | 'none';
 }
 

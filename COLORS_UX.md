@@ -30,6 +30,7 @@
 | `accent-down-text`    | `#DC2626`   | Negative trend / danger text                   |
 
 ### StatusTag Variants
+> **Note**: These variants and semantic color mappings are centralized in `src/lib/theme.ts` via the `themeVariants` object. Do not redefine color maps in components.
 
 | Variant   | Background    | Text          | Use Case                         |
 | --------- | ------------- | ------------- | -------------------------------- |

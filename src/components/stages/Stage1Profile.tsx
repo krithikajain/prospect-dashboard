@@ -34,7 +34,11 @@ export function Stage1Profile({ data }: { data: DashboardData }) {
                     recentNews={pf?.business?.recent_news}
                 />
                 <div className="h-6" />
-                <IcpScoreCard score={scores.icp} />
+                <IcpScoreCard
+                    score={scores.icp}
+                    breakdown={scores.icpBreakdown}
+                    confidence={scores.icpConfidence}
+                />
             </div>
 
             {/* RIGHT COLUMN: Scale, Health, Context, Journey (9 cols) */}

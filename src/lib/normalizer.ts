@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { DashboardData } from "../types/dashboard";
 
 // ---------- helpers ----------
@@ -518,7 +519,7 @@ export const normalizeProspectData = (rawData: any): DashboardData => {
 
             // Card 3: Implementation Readiness
             const hasPartners = (companyOverview.key_partnerships || '').toString().toLowerCase().includes('zoom');
-            let implementationReadiness: 'High' | 'Medium' | 'Low' | 'Unknown' = hasPartners ? 'High' : 'Unknown';
+            const implementationReadiness: 'High' | 'Medium' | 'Low' | 'Unknown' = hasPartners ? 'High' : 'Unknown';
 
             const implNotes: string[] = [];
             const objParsed = safeParse(rawData.objections, { objections: [] });

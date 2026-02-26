@@ -1,4 +1,5 @@
 import { Card, CardHeader } from '@/components/ui/Card';
+import { themeVariants, solidFills, glassVariants } from '@/lib/theme';
 
 /**
  * Authority Deep Dive — BANT Qualification (A).
@@ -86,8 +87,8 @@ function StakeholderMap() {
             <div className="flex flex-col gap-2">
                 {stakeholders.map((s, i) => (
                     <div key={i} className="flex items-center gap-3 py-2 border-b border-slate-50 last:border-b-0">
-                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${s.role === 'Potential Blocker' ? 'bg-red-50 text-red-500' :
-                                s.influence === 'High' ? 'bg-blue-50 text-blue-500' : 'bg-slate-50 text-slate-400'
+                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${s.role === 'Potential Blocker' ? themeVariants.red :
+                            s.influence === 'High' ? themeVariants.blue : themeVariants.slate
                             }`}>
                             <span className="material-symbols-outlined text-[16px]">{s.icon}</span>
                         </div>
@@ -136,12 +137,12 @@ function BuyingProcess() {
                 {steps.map((s, i) => (
                     <div key={i} className="flex items-center gap-2.5 py-1.5">
                         <span className={`material-symbols-outlined text-[16px] shrink-0 ${s.status === 'done' ? 'text-emerald-500' :
-                                s.status === 'active' ? 'text-blue-500' : 'text-slate-300'
+                            s.status === 'active' ? 'text-blue-500' : 'text-slate-300'
                             }`}>
                             {s.status === 'done' ? 'check_circle' : s.status === 'active' ? 'pending' : 'radio_button_unchecked'}
                         </span>
                         <span className={`text-[12px] ${s.status === 'done' ? 'text-slate-500 line-through' :
-                                s.status === 'active' ? 'text-blue-700 font-bold' : 'text-slate-600'
+                            s.status === 'active' ? 'text-blue-700 font-bold' : 'text-slate-600'
                             }`}>{s.label}</span>
                     </div>
                 ))}
@@ -172,7 +173,7 @@ function VendorDynamics() {
             <CardHeader icon="swap_horiz" title="S4 — Vendor & Incumbent" />
 
             {/* Hidden question */}
-            <div className="bg-amber-50/60 border border-amber-100 rounded-xl px-3 py-2.5">
+            <div className={`${glassVariants.amber} rounded-xl px-3 py-2.5`}>
                 <p className="text-[9px] font-bold uppercase tracking-widest text-amber-500 mb-1">Hidden Question</p>
                 <p className="text-[12px] font-semibold text-amber-800 leading-snug italic">
                     "Am I replacing someone's friend?"
@@ -208,7 +209,7 @@ function VendorDynamics() {
             </div>
 
             <div className="mt-auto pt-3 border-t border-slate-100 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-amber-400 shrink-0" />
+                <span className={`w-2 h-2 rounded-full shrink-0 ${solidFills.amber}`} />
                 <span className="text-[11px] font-semibold text-amber-700">Political Risk: Moderate — CTO is incumbent champion</span>
             </div>
         </Card>
@@ -273,7 +274,7 @@ function RoleRow({ label, value, icon, status }: {
             <span className="material-symbols-outlined text-[14px] text-slate-400 shrink-0">{icon}</span>
             <p className="text-[11px] text-slate-500 flex-1">{label}</p>
             <div className="flex items-center gap-1.5">
-                <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${status === 'identified' ? 'bg-emerald-400' : 'bg-red-400'}`} />
+                <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${status === 'identified' ? solidFills.emerald : solidFills.red}`} />
                 <span className={`text-[11px] font-bold ${status === 'identified' ? 'text-emerald-700' : 'text-red-600'}`}>{value}</span>
             </div>
         </div>
@@ -283,7 +284,7 @@ function RoleRow({ label, value, icon, status }: {
 function SignalRow({ label, value, icon, variant }: {
     label: string; value: string; icon: string; variant: 'emerald' | 'amber' | 'red' | 'gray';
 }) {
-    const dotColor = { emerald: 'bg-emerald-400', amber: 'bg-amber-400', red: 'bg-red-400', gray: 'bg-slate-300' }[variant];
+    const dotColor = solidFills[variant] || solidFills.slate;
     const valColor = { emerald: 'text-emerald-700', amber: 'text-amber-700', red: 'text-red-600', gray: 'text-slate-600' }[variant];
     return (
         <div className="flex items-center gap-2.5 py-1.5 border-b border-slate-50">
@@ -305,12 +306,12 @@ function InfluenceBadge({ level }: { level: 'High' | 'Med' | 'Low' }) {
 }
 
 function PoliticalFlag({ label, variant }: { label: string; variant: 'blue' | 'amber' | 'red' }) {
-    const cls = { blue: 'bg-blue-50 text-blue-600 border-blue-100', amber: 'bg-amber-50 text-amber-600 border-amber-100', red: 'bg-red-50 text-red-600 border-red-100' }[variant];
-    return <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${cls}`}>{label}</span>;
+    const cls = themeVariants[variant] || themeVariants.slate;
+    return <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${cls}`}>{label}</span>;
 }
 
 function RiskPill({ label }: { label: string }) {
-    return <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-red-50 text-red-600 border border-red-100">{label}</span>;
+    return <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${themeVariants.red}`}>{label}</span>;
 }
 
 function ProcessTypeBadge({ label }: { label: string }) {

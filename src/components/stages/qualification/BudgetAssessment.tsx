@@ -1,4 +1,5 @@
 import { Card, CardHeader, MetricBox, StatusTag, InfoRow, ChecklistItem } from '@/components/ui';
+import { themeVariants, glassVariants } from '@/lib/theme';
 
 /**
  * Budget Assessment — BANT Qualification (B).
@@ -32,9 +33,9 @@ function BudgetVerdict() {
                 <VerdictMetric icon="person_off" label="Finance" value="Unknown" color="text-slate-400" />
             </div>
 
-            <div className="flex items-center gap-2 bg-red-50 border border-red-100 rounded-lg px-4 py-2">
-                <span className="material-symbols-outlined text-red-500 text-[18px]">warning</span>
-                <span className="text-sm text-red-700 font-medium">Risk Flagged: Budget constraints</span>
+            <div className={`flex items-center gap-2 rounded-lg px-4 py-2 ${themeVariants.red}`}>
+                <span className="material-symbols-outlined text-[18px]">warning</span>
+                <span className="text-sm font-medium">Risk Flagged: Budget constraints</span>
             </div>
         </Card>
     );
@@ -105,7 +106,7 @@ function EconomicBuyer() {
             </div>
 
             {/* Decision Maker */}
-            <div className="bg-emerald-50/50 border border-emerald-100/50 rounded-2xl p-4 relative overflow-hidden">
+            <div className={`${glassVariants.emerald} rounded-2xl p-4 relative overflow-hidden`}>
                 <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-emerald-100/50 to-transparent rounded-bl-full" />
                 <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 mb-1">Decision Maker</p>
                 <div className="flex items-center gap-3">
@@ -158,7 +159,7 @@ function InvestmentRange() {
                 <PillarSubtitle>The "How Much" — bracket & ROI case</PillarSubtitle>
             </div>
 
-            <div className="bg-amber-50/50 border border-amber-100/60 rounded-2xl px-4 py-3 flex items-center justify-between">
+            <div className={`${glassVariants.amber} rounded-2xl px-4 py-3 flex items-center justify-between`}>
                 <div>
                     <p className="text-[10px] font-bold uppercase tracking-wider text-amber-600">Budget Status</p>
                     <p className="text-sm font-bold text-amber-900">TBD — Not Disclosed</p>
@@ -298,7 +299,7 @@ function RoiRow({ metric, value }: { metric: string; value: string }) {
 }
 
 function RepInsight({ children, color }: { children: React.ReactNode; color: 'blue' | 'emerald' | 'amber' | 'red' }) {
-    const bg = { blue: 'bg-blue-50/80 border-blue-100/50', emerald: 'bg-emerald-50/80 border-emerald-100/50', amber: 'bg-amber-50/80 border-amber-100/50', red: 'bg-red-50/80 border-red-100/50' }[color];
+    const bg = glassVariants[color] || glassVariants.slate;
     const text = { blue: 'text-blue-700', emerald: 'text-emerald-700', amber: 'text-amber-800', red: 'text-red-700' }[color];
     return (
         <div className={`w-full mt-4 rounded-xl px-4 py-3 border ${bg}`}>

@@ -88,6 +88,10 @@ Before writing custom markup, check if a primitive already exists in `src/compon
 - **Shadows**: Use `shadow-[0_4px_24px_rgba(0,0,0,0.02)]` — extremely subtle.
 - **Colors**: Refer to `COLORS_UX.md` for exact hex values. Never use raw color names (e.g. `text-red-500`). Use the semantic tokens.
 
+### 3.6 Centralized Theme Utilities
+- **Do not hardcode styling grids or mapping objects** (e.g., `Record<string, string>`) directly inside components.
+- Use the utilities exported from `src/lib/theme.ts` (e.g., `themeVariants`, `getPressureTheme`) to ensure semantic color usage is consistent across the application.
+
 ---
 
 ## 4. Data Rules

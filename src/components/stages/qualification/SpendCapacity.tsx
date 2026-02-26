@@ -1,5 +1,6 @@
 import { Card, CardHeader } from '@/components/ui/Card';
 import type { BudgetSpendCapacity as SpendCapacityData } from '@/data/budgetData';
+import { themeVariants, solidFills } from '@/lib/theme';
 
 interface Props { data: SpendCapacityData }
 
@@ -8,10 +9,15 @@ interface Props { data: SpendCapacityData }
  * Revenue tier, funding stage, profitability, department scale, and spend tier.
  */
 export function SpendCapacity({ data }: Props) {
-    const tierWidth: Record<string, string> = { 'High': 'w-full', 'Moderate': 'w-2/3', 'Constrained': 'w-1/3' };
-    const tierColor: Record<string, string> = { 'High': 'bg-emerald-500', 'Moderate': 'bg-blue-500', 'Constrained': 'bg-red-400' };
-    const tierBg: Record<string, string> = { 'High': 'bg-emerald-50', 'Moderate': 'bg-blue-50', 'Constrained': 'bg-red-50' };
-
+    const tierThemeInfo: Record<string, { theme: keyof typeof themeVariants, width: string }> = {
+        'High': { theme: 'emerald', width: 'w-full' },
+        'Moderate': { theme: 'blue', width: 'w-2/3' },
+        'Constrained': { theme: 'red', width: 'w-1/3' }
+    };
+    const tierConfig = tierThemeInfo[data.spendCapacityTier.value] || { theme: 'slate', width: 'w-1/2' };
+    const tierTextColor = themeVariants[tierConfig.theme].split(' ').find(c => c.startsWith('text-')) || 'text-slate-600';
+    const tierBgColor = themeVariants[tierConfig.theme].split(' ').find(c => c.startsWith('bg-')) || 'bg-slate-50';
+    const tierFillColor = solidFills[tierConfig.theme] || 'bg-slate-400';
     return (
         <Card className="p-6 bg-white border border-gray-100 hover:shadow-md transition-all duration-300 flex flex-col h-full">
             <CardHeader icon="account_balance" title="B. Spend Capacity" />
@@ -20,13 +26,13 @@ export function SpendCapacity({ data }: Props) {
             <div className="mb-5">
                 <div className="flex items-center justify-between mb-1.5">
                     <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Capacity Tier</p>
-                    <span className={`text-xs font-bold ${tierColor[data.spendCapacityTier.value]?.replace('bg-', 'text-')}`}>
+                    <span className={`text-xs font-bold ${tierTextColor}`}>
                         {data.spendCapacityTier.value}
                         {data.spendCapacityTier.isMock && <span className="ml-1 text-[8px] text-slate-300">mock</span>}
                     </span>
                 </div>
-                <div className={`w-full h-2 ${tierBg[data.spendCapacityTier.value] || 'bg-slate-100'} rounded-full overflow-hidden`}>
-                    <div className={`h-full ${tierColor[data.spendCapacityTier.value] || 'bg-slate-400'} ${tierWidth[data.spendCapacityTier.value] || 'w-1/2'} rounded-full transition-all duration-500`} />
+                <div className={`w-full h-2 ${tierBgColor} rounded-full overflow-hidden`}>
+                    <div className={`h-full ${tierFillColor} ${tierConfig.width} rounded-full transition-all duration-500`} />
                 </div>
             </div>
 

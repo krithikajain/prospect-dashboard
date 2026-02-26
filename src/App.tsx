@@ -56,7 +56,7 @@ export default function App() {
         }
     };
 
-    const StageView = () => {
+    const renderStageView = () => {
         if (activeSection === 'home') return <Stage0Home />;
 
         if (activeSection === 'prospect') {
@@ -125,14 +125,14 @@ export default function App() {
 
                     {/* Content Container */}
                     {activeSection === 'home' ? (
-                        <StageView />
+                        renderStageView()
                     ) : (
                         <div className="bg-white shadow-[0_4px_24px_rgba(0,0,0,0.02)] border border-slate-200/80 p-10 flex-1 min-h-[500px] relative z-20 rounded-[32px]">
                             <PageHeader
                                 label={headerLabel}
                                 breadcrumb={activeSection === 'qualification' ? 'Workspace / BANT Analysis' : 'Workspace / Hunt Pipeline'}
                             />
-                            <StageView />
+                            {renderStageView()}
                         </div>
                     )}
                 </div>

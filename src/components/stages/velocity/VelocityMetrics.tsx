@@ -1,17 +1,17 @@
 import { Card } from '@/components/ui/Card';
 import { ScoreDisplay } from '@/components/ui/ScoreDisplay';
 import { StatusTag } from '@/components/ui/StatusTag';
+import { glassVariants, themeVariants } from '@/lib/theme';
 import type { VelocityScores } from './velocityScoring';
-
 export function VelocityMetrics({ scores }: { scores: VelocityScores }) {
     return (
         <div className="flex flex-col gap-4">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
 
                 {/* 1. Velocity & Path Score */}
-                <Card className={`flex flex-col shrink-0 p-6 pt-5 min-h-[160px] border shadow-sm transition-colors duration-300 ${scores.lightLabel === 'Green Light' ? 'bg-emerald-50/40 border-emerald-100/50' :
-                        scores.lightLabel === 'Yellow Light' ? 'bg-amber-50/40 border-amber-100/50' :
-                            'bg-red-50/40 border-red-100/50'
+                <Card className={`flex flex-col shrink-0 p-6 pt-5 min-h-[160px] border shadow-sm transition-colors duration-300 ${scores.lightLabel === 'Green Light' ? glassVariants.emerald :
+                    scores.lightLabel === 'Yellow Light' ? glassVariants.amber :
+                        glassVariants.red
                     }`}>
                     <div className="flex justify-between items-center mb-1">
                         <p className="text-xs font-bold text-gray-500 tracking-[0.15em] uppercase">Velocity Score</p>
@@ -84,10 +84,10 @@ export function VelocityMetrics({ scores }: { scores: VelocityScores }) {
             {/* Driver Tags */}
             <div className="flex flex-wrap items-center gap-2">
                 <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider mr-2">Primary Drivers</span>
-                <span className="px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-full text-xs font-semibold">Warm intro available</span>
-                <span className="px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-full text-xs font-semibold">Active hiring for migration</span>
-                <span className="px-3 py-1 bg-amber-50 text-amber-700 border border-amber-100 rounded-full text-xs font-semibold">Security constraints</span>
-                <span className="px-3 py-1 bg-red-50 text-red-700 border border-red-100 rounded-full text-xs font-semibold">High switching cost</span>
+                <span className={`px-3 py-1 rounded-full text-xs font-semibold border shadow-sm ${themeVariants.emerald}`}>Warm intro available</span>
+                <span className={`px-3 py-1 rounded-full text-xs font-semibold border shadow-sm ${themeVariants.emerald}`}>Active hiring for migration</span>
+                <span className={`px-3 py-1 rounded-full text-xs font-semibold border shadow-sm ${themeVariants.amber}`}>Security constraints</span>
+                <span className={`px-3 py-1 rounded-full text-xs font-semibold border shadow-sm ${themeVariants.red}`}>High switching cost</span>
             </div>
         </div>
     );
