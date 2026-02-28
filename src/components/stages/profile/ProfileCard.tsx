@@ -23,7 +23,7 @@ export function ProfileCard({
     const [isFlipped, setIsFlipped] = useState(false);
 
     return (
-        <Card padding="none" className="relative overflow-hidden flex-1 min-h-[500px] flex flex-col border-none shadow-xl rounded-[24px] perspective-1000">
+        <Card padding="none" className="relative overflow-hidden flex-1 min-h-[420px] lg:min-h-[460px] flex flex-col border-none shadow-xl rounded-[24px] perspective-1000">
             <div className={`w-full h-full absolute inset-0 transition-transform duration-700 preserve-3d ${isFlipped ? '[transform:rotateY(180deg)]' : ''}`}>
                 {/* FRONT */}
                 <FrontFace
@@ -66,10 +66,9 @@ function FrontFace({ name, company, role, functionalOwnership, personalityTags, 
 
             <div className="relative z-10 p-6 text-white w-full h-full flex flex-col justify-between">
                 <div className="mt-6 flex justify-between items-start">
-                    <h2 className="text-[36px] font-medium leading-[1.1] tracking-tight w-[70%]">
+                    <h2 className="text-[36px] font-medium leading-[1.1] tracking-tight w-full">
                         {name.split(' ').map((part, i) => <span key={i}>{part}<br /></span>)}
                     </h2>
-                    <span className="material-symbols-outlined text-white text-[24px] opacity-90" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
                 </div>
 
                 <div className="mt-auto mb-6 space-y-3 font-light text-[14px]">
@@ -86,9 +85,11 @@ function FrontFace({ name, company, role, functionalOwnership, personalityTags, 
                     <button onClick={onFlip} className="bg-white text-slate-900 px-8 py-2.5 rounded-full text-sm font-semibold hover:bg-gray-100 transition-colors flex items-center justify-center gap-1 shadow-sm w-fit self-start">
                         Connect <span className="text-xl leading-none font-light mb-0.5">+</span>
                     </button>
-                    <div className="flex items-center justify-start gap-2 pt-1 w-full overflow-x-auto no-scrollbar">
+                    <div className="flex flex-wrap items-center justify-start gap-2 pt-1 w-full">
                         {personalityTags.slice(0, 3).map((tag, idx) => (
-                            <span key={idx} className="px-3.5 py-1.5 rounded-full bg-[#1A1C20]/80 backdrop-blur-md text-[11px] font-medium text-gray-200 shadow-sm border border-white/10 whitespace-nowrap">{tag}</span>
+                            <span key={idx} className="inline-block px-3.5 py-1.5 rounded-full bg-[#1A1C20]/90 backdrop-blur-md text-[11px] font-medium text-white shadow-sm border border-white/20 whitespace-normal">
+                                {tag}
+                            </span>
                         ))}
                     </div>
                 </div>

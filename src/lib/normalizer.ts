@@ -163,6 +163,7 @@ export const normalizeProspectData = (rawData: any): DashboardData => {
     const industryTrends = safeParse(rawData.industry_trends, {});
     const buyingCycle = safeParse(rawData.buying_cycle, {});
     const valueProposition = safeParse(rawData.value_proposition, {});
+    const kpisJSON = safeParse(rawData.kpis_and_key_performance_indicators, {});
 
     // company details can live in multiple places across variants
     const companyDetails =
@@ -359,6 +360,19 @@ export const normalizeProspectData = (rawData: any): DashboardData => {
                 recent_news: "Recently secured $120M Series C funding to accelerate AI capabilities.",
                 market_pressures: "Increasing competition from legacy CRM providers consolidating tech.",
                 digital_maturity: "Adopting AI tools, moving away from fragmented legacy stacks.",
+                kpis: {
+                    revenue_history: kpisJSON.mock_revenue_history || [
+                        { year: '2019', revenue_growth: 15, net_profit_margin: 10 },
+                        { year: '2020', revenue_growth: 18, net_profit_margin: 12 },
+                        { year: '2021', revenue_growth: 22, net_profit_margin: 14 },
+                        { year: '2022', revenue_growth: 20, net_profit_margin: 13 },
+                        { year: '2023', revenue_growth: 24, net_profit_margin: 15 },
+                    ],
+                    market_share: kpisJSON.mock_market_share || "12%",
+                    employees: kpisJSON.mock_employees || companyOverview.company_size || companyOverview.companySize || "850+",
+                    hiring_velocity: kpisJSON.mock_hiring_velocity || "Expanding (+15% YoY)",
+                    product_launches: kpisJSON.mock_product_launches || "4 in 2023",
+                }
             },
             output: {
                 icp_score: (rawData.opportunity_score || 50) > 0 ? 92 : 84, // placeholder 

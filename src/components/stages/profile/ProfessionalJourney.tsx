@@ -18,9 +18,9 @@ export function ProfessionalJourney() {
     const [tab, setTab] = useState<'Workspace' | 'Education'>('Workspace');
 
     return (
-        <Card className="flex flex-col h-full overflow-hidden">
+        <Card padding="sm" className="flex flex-col h-full overflow-hidden">
             {/* Header + Tab Toggle */}
-            <div className="flex justify-between items-start mb-2 z-10 w-full">
+            <div className="flex justify-between items-start mb-1 z-10 w-full">
                 <div>
                     <h3 className="text-slate-900 font-bold text-lg tracking-tight">Professional Journey</h3>
                     <p className="text-gray-400 text-[11px] mt-0.5 font-medium uppercase tracking-wider">Background & Trajectory</p>

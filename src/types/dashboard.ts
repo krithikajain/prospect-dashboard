@@ -94,6 +94,17 @@ export interface DashboardData {
             recent_news: string;
             market_pressures: string;
             digital_maturity: string;
+            kpis?: {
+                revenue_history: Array<{
+                    year: string;
+                    revenue_growth: number;
+                    net_profit_margin: number;
+                }>;
+                market_share: string;
+                employees: string;
+                hiring_velocity: string;
+                product_launches: string;
+            };
         };
         output: {
             icp_score: number;

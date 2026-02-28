@@ -10,13 +10,11 @@ interface AuthorityPathProps {
 export function AuthorityPath({ contactName }: AuthorityPathProps) {
     return (
         <Card className="p-6 group hover:shadow-lg transition-all duration-300">
-            <CardHeader icon="manage_accounts" title="1. Authority" />
+            <div className="flex items-center justify-between mb-2">
+                <CardHeader icon="manage_accounts" title="1. Authority" />
+                <span className="border border-emerald-200 bg-emerald-50 text-emerald-700 px-2 py-1 rounded-md text-[10px] font-bold tracking-widest uppercase shadow-sm">Decision Maker</span>
+            </div>
             <div className="mt-4">
-                <div className="flex items-center gap-2 mb-6">
-                    <span className="text-xs font-bold uppercase tracking-wider text-gray-500">Contact Tag:</span>
-                    <span className="bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-md text-xs font-semibold border border-emerald-100">Decision Maker</span>
-                </div>
-
                 <p className="text-[11px] text-gray-500 font-medium uppercase tracking-wider mb-6 mt-1">The Signature Path</p>
 
                 <div className="flex flex-col gap-6 relative px-2">

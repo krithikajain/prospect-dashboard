@@ -32,7 +32,7 @@ export function IcpScoreCard({ score, breakdown = [], confidence = "Medium" }: I
                 />
             </div>
 
-            <div className="flex flex-wrap items-center justify-between gap-4 mb-4 relative z-10 w-full">
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-10 relative z-10 w-full">
                 <ScoreDisplay
                     score={score}
                     tooltip={

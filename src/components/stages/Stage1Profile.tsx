@@ -4,8 +4,9 @@ import { ProfileCard } from './profile/ProfileCard';
 import { IcpScoreCard } from './profile/IcpScoreCard';
 import { OrganizationalFootprint } from './profile/OrganizationalFootprint';
 import { CompanyHealth } from './profile/CompanyHealth';
-import { BusinessContext } from './profile/BusinessContext';
+// import { BusinessContext } from './profile/BusinessContext';
 import { ProfessionalJourney } from './profile/ProfessionalJourney';
+import { KPIs } from './profile/KPIs';
 
 /**
  * Stage 1 — Profile Fit.
@@ -33,7 +34,6 @@ export function Stage1Profile({ data }: { data: DashboardData }) {
                     digitalFootprint={pf?.contact?.digital_footprint}
                     recentNews={pf?.business?.recent_news}
                 />
-                <div className="h-6" />
                 <IcpScoreCard
                     score={scores.icp}
                     breakdown={scores.icpBreakdown}
@@ -43,16 +43,25 @@ export function Stage1Profile({ data }: { data: DashboardData }) {
 
             {/* RIGHT COLUMN: Scale, Health, Context, Journey (9 cols) */}
             <div className="col-span-1 xl:col-span-9 flex flex-col gap-4">
-                <OrganizationalFootprint />
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    <CompanyHealth data={data} />
-                    <BusinessContext
-                        recentNews={pf?.business?.recent_news}
-                        marketPressures={pf?.business?.market_pressures}
-                        digitalMaturity={pf?.business?.digital_maturity}
-                    />
+                <OrganizationalFootprint data={data} />
+
+                <div className="grid grid-cols-12 gap-4">
+                    <div className="col-span-5">
+                        <CompanyHealth data={data} />
+                    </div>
+                    <div className="col-span-7 grid grid-cols-1 gap-4">
+                        <KPIs kpis={pf?.business?.kpis} />
+                        {/* <BusinessContext
+                            recentNews={pf?.business?.recent_news}
+                            marketPressures={pf?.business?.market_pressures}
+                            digitalMaturity={pf?.business?.digital_maturity}
+                        /> */}
+                    </div>
                 </div>
-                <ProfessionalJourney />
+
+                <div className="flex-1">
+                    <ProfessionalJourney />
+                </div>
             </div>
 
         </div>
