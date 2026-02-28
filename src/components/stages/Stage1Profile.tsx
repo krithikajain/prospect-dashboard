@@ -14,8 +14,8 @@ import { KPIs } from './profile/KPIs';
  */
 export function Stage1Profile({ data }: { data: DashboardData }) {
     const pf = data.profile_fit;
-    const name = data.identity?.name || 'Elena Vance';
-    const company = data.identity?.company || 'Acme Corp';
+    const name = data.identity?.name;
+    const company = data.identity?.company;
     const scores = calculateScores(data);
 
     return (
@@ -26,7 +26,7 @@ export function Stage1Profile({ data }: { data: DashboardData }) {
                 <ProfileCard
                     name={name}
                     company={company}
-                    role={pf?.contact?.role || 'Founder & CEO'}
+                    role={pf?.contact?.role}
                     functionalOwnership={pf?.contact?.functional_ownership}
                     personalityTags={data.identity?.personality_tags || ['Pragmatic', 'Data-Driven', 'Visionary']}
                     email={data.identity?.email}
