@@ -1,12 +1,20 @@
 import { Card, CardHeader, DataInsight } from '@/components/ui/Card';
 import type { DashboardData } from '@/types/dashboard';
 
+/**
+ * Props for the CompanyHealth component.
+ */
 interface CompanyHealthProps {
+    /** The normalized prospect dashboard data. */
     data: DashboardData;
 }
 
 /**
- * Company health card: data insights grid layout.
+ * A layout component that presents a high-level summary of the company's vital signs.
+ * Includes industry focus, financial range, geographic presence, and workforce velocity.
+ * 
+ * @param {CompanyHealthProps} props - The component props.
+ * @returns {JSX.Element} The rendered CompanyHealth component.
  */
 export function CompanyHealth({ data }: CompanyHealthProps) {
     const pf = data.profile_fit;
@@ -20,7 +28,6 @@ export function CompanyHealth({ data }: CompanyHealthProps) {
                 <DataInsight label="Employees" value={pf?.business?.kpis?.employees} />
                 <DataInsight label="Hiring Velocity" value={pf?.business?.kpis?.hiring_velocity} highlight />
                 <DataInsight label="Market Share" value={pf?.business?.kpis?.market_share} />
-                {/* <DataInsight className="col-span-1 md:col-span-2" label="Growth Stage" value={<span className="bg-slate-900 text-white px-2.5 py-0.5 rounded-full text-[11px] font-semibold">{pf?.company?.growth_stage} • {pf?.company?.funding_status}</span>} /> */}
             </div>
         </Card>
     );

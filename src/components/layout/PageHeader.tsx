@@ -1,10 +1,22 @@
+/**
+ * Props for the PageHeader component.
+ */
 interface PageHeaderProps {
+    /** The main title text for the page. */
     label: string;
+    /** 
+     * The breadcrumb text to display above the title. 
+     * @default "Workspace / Hunt Pipeline"
+     */
     breadcrumb?: string;
 }
 
 /**
- * Breadcrumb trail + large page title shown on all non-home stages.
+ * Standard header component for application pages (stages).
+ * Displays a breadcrumb trail with an icon and a large, stylized page title.
+ * 
+ * @param {PageHeaderProps} props - The component props.
+ * @returns {JSX.Element} The rendered PageHeader component.
  */
 export function PageHeader({ label, breadcrumb = "Workspace / Hunt Pipeline" }: PageHeaderProps) {
     return (

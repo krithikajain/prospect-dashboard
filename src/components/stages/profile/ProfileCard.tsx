@@ -1,20 +1,37 @@
 import { useState } from 'react';
 import { Card } from '@/components/ui/Card';
 
+/**
+ * Props for the ProfileCard component.
+ */
 interface ProfileCardProps {
+    /** Full name of the prospect. */
     name: string;
+    /** Current company name. */
     company: string;
+    /** Professional job title. */
     role: string;
+    /** Area of functional ownership or expertise. */
     functionalOwnership?: string;
+    /** Array of descriptive personality or skill tags. */
     personalityTags: string[];
+    /** Direct email address (optional). */
     email?: string;
+    /** Link to personal or company website (optional). */
     website?: string;
+    /** Qualitative summary of online presence (podcasts, articles). */
     digitalFootprint?: string;
+    /** Summary of recent news involving the prospect. */
     recentNews?: string;
 }
 
 /**
- * Flip-card showing the prospect's photo/info on front, connect links on back.
+ * A flagship interactive component that showcases a prospect's primary identity.
+ * Features a 3D flip-card animation to toggle between a visual profile face 
+ * and a functional "Connect" back face with direct contact channels and mentions.
+ * 
+ * @param {ProfileCardProps} props - The component props.
+ * @returns {JSX.Element} The rendered ProfileCard component.
  */
 export function ProfileCard({
     name, company, role, functionalOwnership,
@@ -54,10 +71,27 @@ export function ProfileCard({
 
 /* ────────────────────────── Front Face ────────────────────────── */
 
-function FrontFace({ name, company, role, functionalOwnership, personalityTags, onFlip, isFlipped }: {
-    name: string; company: string; role: string; functionalOwnership?: string;
-    personalityTags: string[]; onFlip: () => void; isFlipped: boolean;
-}) {
+/**
+ * Props for the FrontFace auxiliary component.
+ */
+interface FrontFaceProps {
+    name: string;
+    company: string;
+    role: string;
+    functionalOwnership?: string;
+    personalityTags: string[];
+    onFlip: () => void;
+    isFlipped: boolean;
+}
+
+/**
+ * Internal component for the primary visual face of the ProfileCard.
+ * Displays the prospect's photo, role, and personality tags at the bottom.
+ * 
+ * @param {FrontFaceProps} props - The component props.
+ * @returns {JSX.Element} The rendered FrontFace component.
+ */
+function FrontFace({ name, company, role, functionalOwnership, personalityTags, onFlip, isFlipped }: FrontFaceProps) {
     return (
         <div className={`absolute inset-0 backface-hidden w-full h-full flex flex-col justify-end transition-opacity duration-300 ${isFlipped ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-auto'}`}>
             <img alt={name} className="absolute inset-0 w-full h-full object-cover object-top" src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8Y2VvfGVufDB8fDB8fHww" />
@@ -100,11 +134,28 @@ function FrontFace({ name, company, role, functionalOwnership, personalityTags, 
 
 /* ────────────────────────── Back Face ────────────────────────── */
 
-function BackFace({ name, company, email, website, digitalFootprint, recentNews, onFlip, isFlipped }: {
-    name: string; company: string; email?: string; website?: string;
-    digitalFootprint?: string; recentNews?: string;
-    onFlip: () => void; isFlipped: boolean;
-}) {
+/**
+ * Props for the BackFace auxiliary component.
+ */
+interface BackFaceProps {
+    name: string;
+    company: string;
+    email?: string;
+    website?: string;
+    digitalFootprint?: string;
+    recentNews?: string;
+    onFlip: () => void;
+    isFlipped: boolean;
+}
+
+/**
+ * Internal component for the secondary interaction face of the ProfileCard.
+ * Displays contact icons and an scrollable list of recent mentions/news items.
+ * 
+ * @param {BackFaceProps} props - The component props.
+ * @returns {JSX.Element} The rendered BackFace component.
+ */
+function BackFace({ name, company, email, website, digitalFootprint, recentNews, onFlip, isFlipped }: BackFaceProps) {
     return (
         <div className={`absolute inset-0 backface-hidden w-full h-full [transform:rotateY(180deg)] flex flex-col transition-opacity duration-300 ${!isFlipped ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-auto'}`}>
             <img alt={name} className="absolute inset-0 w-full h-full object-cover opacity-20" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=800&q=80" />
@@ -150,6 +201,15 @@ function BackFace({ name, company, email, website, digitalFootprint, recentNews,
 
 /* ────────────────────────── Helpers ────────────────────────── */
 
+/**
+ * Circle icon link component for social media and communication channels.
+ * 
+ * @param {Object} props - The component props.
+ * @param {string} props.href - Destination URL.
+ * @param {string} [props.bg] - Tailwind background color class.
+ * @param {React.ReactNode} props.children - Icon element.
+ * @returns {JSX.Element} The rendered SocialIcon component.
+ */
 function SocialIcon({ href, bg = 'bg-white/10', children }: { href: string; bg?: string; children: React.ReactNode }) {
     return (
         <a href={href} className={`w-12 h-12 rounded-full ${bg} flex items-center justify-center text-white hover:opacity-90 transition-opacity border border-white/5`}>
@@ -158,6 +218,17 @@ function SocialIcon({ href, bg = 'bg-white/10', children }: { href: string; bg?:
     );
 }
 
+/**
+ * Individual row component for displaying a latest mention or news clip on the back of the profile card.
+ * 
+ * @param {Object} props - The component props.
+ * @param {string} props.icon - Google Material Symbols icon name.
+ * @param {string} props.iconColor - Tailwind text color class for the icon.
+ * @param {string} props.title - Short title of the mention.
+ * @param {string} props.text - Descriptive text or summary.
+ * @param {boolean} [props.isYoutube] - Whether to use a specialized YouTube logo instead of a generic icon.
+ * @returns {JSX.Element} The rendered MentionLink component.
+ */
 function MentionLink({ icon, iconColor, title, text, isYoutube }: { icon: string; iconColor: string; title: string; text: string; isYoutube?: boolean }) {
     return (
         <a href="#" className="flex flex-col gap-1.5 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors border border-white/5 group block">

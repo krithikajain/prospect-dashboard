@@ -2,13 +2,32 @@ import { Card, CardHeader } from '@/components/ui/Card';
 import type { DashboardData } from '@/types/dashboard';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
+/**
+ * Props for the KPIs component.
+ */
 interface KPIsProps {
+    /** 
+     * Key Performance Indicators data object, sourced from normalized prospect data.
+     * Contains historical revenue and margin data for charting.
+     */
     kpis?: DashboardData['profile_fit']['business']['kpis'];
 }
 
+/**
+ * A component visualizing key performance indicators with a focus on historical growth.
+ * Renders a sleek, custom-styled Recharts line chart showing 5-year revenue trends 
+ * and profit margins with black/grey accents.
+ * 
+ * @param {KPIsProps} props - The component props.
+ * @returns {JSX.Element | null} The rendered KPIs component or null if no data is present.
+ */
 export function KPIs({ kpis }: KPIsProps) {
     if (!kpis) return null;
 
+    /**
+     * Internal custom tooltip component for the Recharts line chart.
+     * Displays technical details for specific data points on hover.
+     */
     const CustomTooltip = ({ active, payload, label }: any) => {
         if (active && payload && payload.length) {
             const data = payload[0].payload;

@@ -3,8 +3,22 @@ import { Card, CardHeader } from '@/components/ui/Card';
 import { MetricBox } from '@/components/ui/MetricBox';
 import type { DashboardData } from '@/types/dashboard';
 
-interface OrganizationalFootprintProps { data?: DashboardData; }
+/**
+ * Props for the OrganizationalFootprint component.
+ */
+interface OrganizationalFootprintProps {
+    /** The normalized dashboard data providing company profile details. */
+    data?: DashboardData;
+}
 
+/**
+ * A top-level summary component displaying the prospect's organizational scale and status.
+ * Renders a horizontal band of interactive metrics including funding, user count, and growth stage.
+ * Features hover-reactive tiles for enhanced user engagement.
+ * 
+ * @param {OrganizationalFootprintProps} props - The component props.
+ * @returns {JSX.Element} The rendered OrganizationalFootprint component.
+ */
 export function OrganizationalFootprint({ data }: OrganizationalFootprintProps) {
     const fundingStatus = data?.profile_fit?.company?.funding_status;
     const stageLabel = fundingStatus ? `${fundingStatus}` : 'Series C';
@@ -23,6 +37,12 @@ export function OrganizationalFootprint({ data }: OrganizationalFootprintProps) 
     );
 }
 
+/**
+ * Enhanced wrapper for the MetricBox component that adds hover animations and shadow effects.
+ * 
+ * @param {React.ComponentProps<typeof MetricBox>} props - Standard MetricBox props.
+ * @returns {JSX.Element} The rendered MetricBoxHover component.
+ */
 function MetricBoxHover(props: React.ComponentProps<typeof MetricBox>) {
     return (
         <div className="group/tile transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md rounded-2xl">

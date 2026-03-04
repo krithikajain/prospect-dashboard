@@ -1,16 +1,30 @@
 import { themeVariants, type StatusVariant } from '@/lib/theme';
 
+/**
+ * Props for the StatusTag component.
+ */
 interface StatusTagProps {
+    /** The text label to display within the tag. */
     label: string;
+    /** 
+     * The color variant of the tag, mapping to standard dashboard status colors.
+     * @default 'slate'
+     */
     variant?: StatusVariant;
+    /** Optional Google Material Symbols icon name. */
     icon?: string;
+    /** Optional circle dot prefix. */
     dot?: boolean;
+    /** Additional CSS classes for the container. */
     className?: string;
 }
 
 /**
- * Small colored pill/tag used throughout the dashboard for status indicators.
+ * Small colored pill/tag component used for status indicators, confidence levels, and severity.
  * Uses centralized semantic colors from src/lib/theme.ts.
+ * 
+ * @param {StatusTagProps} props - The component props.
+ * @returns {JSX.Element} The rendered StatusTag component.
  */
 export function StatusTag({ label, variant = 'slate', icon, dot, className = '' }: StatusTagProps) {
     const variantClass = themeVariants[variant] || themeVariants.slate;

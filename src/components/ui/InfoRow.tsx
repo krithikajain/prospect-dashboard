@@ -1,17 +1,33 @@
 import * as React from 'react';
 
+/**
+ * Props for the InfoRow component.
+ */
 interface InfoRowProps {
+    /** Google Material Symbols icon name. */
     icon: string;
+    /** 
+     * Tailwind color classes for the icon container.
+     * @default 'text-gray-500 bg-gray-50'
+     */
     iconColor?: string;
+    /** Main title text for the row. */
     title: string;
+    /** Optional supporting description text. */
     description?: string;
+    /** Optional element to display on the trailing (right) side of the row. */
     trailing?: React.ReactNode;
+    /** Additional CSS classes for the container. */
     className?: string;
 }
 
 /**
- * A row with an icon circle, title + description, and an optional trailing element.
- * Used for stakeholder lists, committee members, urgency items, etc.
+ * A reusable row component with an icon circle on the left, title/description in the middle,
+ * and an optional trailing element on the right.
+ * Used for stakeholder lists, committee members, and metadata rows.
+ * 
+ * @param {InfoRowProps} props - The component props.
+ * @returns {JSX.Element} The rendered InfoRow component.
  */
 export function InfoRow({ icon, iconColor = 'text-gray-500 bg-gray-50', title, description, trailing, className = '' }: InfoRowProps) {
     return (

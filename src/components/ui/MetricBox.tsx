@@ -1,18 +1,36 @@
 import * as React from 'react';
 
+/**
+ * Props for the MetricBox component.
+ */
 interface MetricBoxProps {
+    /** The title/label for the metric at the top. */
     label: string;
+    /** The main numeric or text value to display prominently. */
     value: string;
-    trend?: { direction: 'up' | 'down'; label: string };
+    /** Optional trend data showing an up/down arrow and a label. */
+    trend?: {
+        /** The direction of the trend arrow. */
+        direction: 'up' | 'down';
+        /** Text label to display next to the trend arrow. */
+        label: string
+    };
+    /** Optional background chart component to display at the bottom. */
     chart?: React.ReactNode;
+    /** Optional large background icon (material symbol name). */
     icon?: string;
+    /** Optional small icon to display next to the label. */
     smallIcon?: string;
+    /** Additional CSS classes for the container. */
     className?: string;
 }
 
 /**
- * A stat tile showing a label, a big value, an optional trend badge,
- * and an optional background chart or decorative icon.
+ * A reusable stat tile component displaying a label, a large value, and supporting
+ * metadata like trends, background icons, or mini-charts.
+ * 
+ * @param {MetricBoxProps} props - The component props.
+ * @returns {JSX.Element} The rendered MetricBox component.
  */
 export function MetricBox({ label, value, trend, chart, icon, smallIcon, className = '' }: MetricBoxProps) {
     return (

@@ -3,14 +3,33 @@ import { ScoreDisplay } from '@/components/ui/ScoreDisplay';
 import { StatusTag } from '@/components/ui/StatusTag';
 import { glassVariants, type StatusVariant } from '@/lib/theme';
 
+/**
+ * Props for the IcpScoreCard component.
+ */
 interface IcpScoreCardProps {
+    /** The calculated score for Ideal Customer Profile (ICP) fit. */
     score: number;
-    breakdown?: { label: string; delta: number }[];
+    /** Optional breakdown of the factors contributing to the score. */
+    breakdown?: {
+        /** Descriptive name for the score factor (e.g., 'Revenue Range'). */
+        label: string;
+        /** The positive or negative score adjustment from this factor. */
+        delta: number
+    }[];
+    /** 
+     * The statistical confidence level of the calculated ICP score.
+     * @default "Medium"
+     */
     confidence?: "High" | "Medium" | "Low";
 }
 
 /**
- * Displays the ICP Fit Score with confidence badge, hover tooltip, and factor pills.
+ * A stylized component that visualizes the ICP Fit Score.
+ * Includes a large numeric gauge, a confidence indicator, and a breakdown of contributing factors.
+ * Uses glassmorphism styling that adaptively changes based on the score intensity.
+ * 
+ * @param {IcpScoreCardProps} props - The component props.
+ * @returns {JSX.Element} The rendered IcpScoreCard component.
  */
 export function IcpScoreCard({ score, breakdown = [], confidence = "Medium" }: IcpScoreCardProps) {
     const variant = score >= 80 ? 'emerald' : score >= 60 ? 'amber' : 'gray';

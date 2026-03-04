@@ -1,13 +1,23 @@
 import { Card, CardHeader } from '@/components/ui/Card';
 
+/**
+ * Props for the BusinessContext component.
+ */
 interface BusinessContextProps {
+    /** Summary of recent publicly available news or events. */
     recentNews?: string;
+    /** Summary of current pressures in the prospect's specific market. */
     marketPressures?: string;
+    /** Qualitative assessment of the prospect's digital adoption levels. */
     digitalMaturity?: string;
 }
 
 /**
- * Business context card showing recent news, market pressures, and digital maturity.
+ * A card component that provides qualitative context on the prospect's business environment.
+ * Highlights key external drivers like news, market trends, and internal maturity.
+ * 
+ * @param {BusinessContextProps} props - The component props.
+ * @returns {JSX.Element} The rendered BusinessContext component.
  */
 export function BusinessContext({ recentNews, marketPressures, digitalMaturity }: BusinessContextProps) {
     return (
@@ -25,6 +35,14 @@ export function BusinessContext({ recentNews, marketPressures, digitalMaturity }
     );
 }
 
+/**
+ * Internal auxiliary component for rendering an individual context data point.
+ * 
+ * @param {Object} props - The component props.
+ * @param {string} props.label - Small uppercase label for the context field.
+ * @param {string} [props.value] - The qualitative text content.
+ * @returns {JSX.Element} The rendered ContextField component.
+ */
 function ContextField({ label, value }: { label: string; value?: string }) {
     return (
         <div className="p-3 bg-gray-50 hover:bg-gray-100 transition-colors duration-300 rounded-lg border border-transparent hover:border-gray-200">

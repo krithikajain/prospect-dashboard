@@ -1,26 +1,51 @@
+/**
+ * Represents a top-level section in the navigation system.
+ */
 export interface NavSection {
+    /** Unique identifier for the section. */
     id: string;
+    /** Human-readable label for the navigation item. */
     label: string;
+    /** Google Material Symbols icon name. */
     icon: string;
+    /** Optional array of sub-tabs within this section. */
     tabs?: NavTab[];
 }
 
+/**
+ * Represents a sub-tab within a navigation section.
+ */
 export interface NavTab {
+    /** Unique identifier for the tab. */
     id: string;
+    /** Human-readable label for the tab. */
     label: string;
+    /** Google Material Symbols icon name. */
     icon: string;
 }
 
+/**
+ * Props for the Navbar component.
+ */
 interface NavbarProps {
+    /** The complete navigation structure configuration. */
     config: readonly NavSection[];
+    /** ID of the currently active main section. */
     activeSectionId: string;
+    /** ID of the currently active sub-tab (calculated from parent). */
     activeTabId?: string;
+    /** Callback triggered when a main section is clicked. */
     onSectionChange: (sectionId: string) => void;
+    /** Callback triggered when a sub-tab is clicked. */
     onTabChange: (tabId: string) => void;
 }
 
 /**
- * Floating glass-morphism navigation bar with main sections.
+ * Top-mounted floating navigation component with glassmorphism styling.
+ * Handles the persistent global navigation between high-level application sections.
+ * 
+ * @param {Omit<NavbarProps, 'activeTabId' | 'onTabChange'>} props - The component props.
+ * @returns {JSX.Element} The rendered Navbar component.
  */
 export function Navbar({ config, activeSectionId, onSectionChange }: Omit<NavbarProps, 'activeTabId' | 'onTabChange'>) {
     return (

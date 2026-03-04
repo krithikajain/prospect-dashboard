@@ -1,15 +1,28 @@
 import * as React from 'react';
 
+/**
+ * Props for the ScoreDisplay component.
+ */
 interface ScoreDisplayProps {
+    /** The actual score value to display. */
     score: number;
+    /** 
+     * The maximum possible score value. 
+     * @default 100
+     */
     maxScore?: number;
+    /** Optional content for the hover tooltip. */
     tooltip?: React.ReactNode;
+    /** Additional CSS classes for the container. */
     className?: string;
 }
 
 /**
- * A large numeric score display with hover-tooltip support.
- * Used for ICP Fit Score, Influence Score, etc.
+ * A reusable component for displaying scores (e.g., ICP Fit Score) prominently.
+ * Features a large main score, a maximum score indicator, and a hover-activated tooltip.
+ * 
+ * @param {ScoreDisplayProps} props - The component props.
+ * @returns {JSX.Element} The rendered ScoreDisplay component.
  */
 export function ScoreDisplay({ score, maxScore = 100, tooltip, className = '' }: ScoreDisplayProps) {
     return (

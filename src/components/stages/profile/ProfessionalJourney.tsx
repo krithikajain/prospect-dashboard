@@ -1,6 +1,10 @@
 import { useState } from 'react';
 import { Card } from '@/components/ui/Card';
 
+/** 
+ * Mock static career history data used for the horizontal timeline visualization. 
+ * @private
+ */
 const careerData = [
     { year: '2020 - Present', role: 'CEO', company: 'Acme Corp', isCurrent: true },
     { year: '2019 - 2020', role: 'CRO', company: 'Tech Inc' },
@@ -12,7 +16,11 @@ const careerData = [
 ];
 
 /**
- * Professional Journey card with Workspace (career chart) and Education tabs.
+ * A tabbed card component that visualizes a prospect's career trajectory and educational background.
+ * Features a horizontal interactive timeline for professional history (Workspace)
+ * and a detailed list for academic achievements (Education).
+ * 
+ * @returns {JSX.Element} The rendered ProfessionalJourney component.
  */
 export function ProfessionalJourney() {
     const [tab, setTab] = useState<'Workspace' | 'Education'>('Workspace');
@@ -48,6 +56,12 @@ export function ProfessionalJourney() {
 
 /* ────────── Workspace Tab ────────── */
 
+/**
+ * Internal component for the 'Workspace' tab content.
+ * Renders a horizontal timeline visualizing career progression from entry-level to current role.
+ * 
+ * @returns {JSX.Element} The rendered WorkspaceTab component.
+ */
 function WorkspaceTab() {
     return (
         <div className="w-full flex-1 relative z-10 flex flex-col justify-center animate-in fade-in slide-in-from-bottom-2 duration-500 px-2 mt-4 pb-2">
@@ -96,6 +110,12 @@ function WorkspaceTab() {
 
 /* ────────── Education Tab ────────── */
 
+/**
+ * Internal component for the 'Education' tab content.
+ * Renders a list of educational milestones (Degrees, Schools, Dates).
+ * 
+ * @returns {JSX.Element} The rendered EducationTab component.
+ */
 function EducationTab() {
     return (
         <div className="w-full mt-2 flex flex-col gap-0 relative z-10 animate-in fade-in slide-in-from-bottom-2 duration-500">
@@ -105,9 +125,29 @@ function EducationTab() {
     );
 }
 
-function EducationEntry({ degree, school, year, icon, borderTop }: {
-    degree: string; school: string; year: string; icon: string; borderTop?: boolean;
-}) {
+/**
+ * Props for the EducationEntry auxiliary component.
+ */
+interface EducationEntryProps {
+    /** The degree or qualification obtained. */
+    degree: string;
+    /** The school or university name. */
+    school: string;
+    /** The graduating class or year range. */
+    year: string;
+    /** Google Material Symbols icon name. */
+    icon: string;
+    /** Whether to display a divider border at the top. */
+    borderTop?: boolean;
+}
+
+/**
+ * Renders a single entry in the Education list.
+ * 
+ * @param {EducationEntryProps} props - The component props.
+ * @returns {JSX.Element} The rendered EducationEntry component.
+ */
+function EducationEntry({ degree, school, year, icon, borderTop }: EducationEntryProps) {
     return (
         <div className={`flex justify-between items-start gap-2 py-4 ${borderTop ? 'border-t border-gray-50' : ''}`}>
             <div className="flex gap-3 items-start">

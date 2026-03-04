@@ -1,19 +1,38 @@
 import type { DashboardData } from '@/types/dashboard';
 
+/**
+ * Data inputs required to calculate an ICP (Ideal Customer Profile) Fit Score.
+ */
 export interface IcpInputs {
+    /** High-level metrics about the company's scale and operational status. */
     company: {
+        /** Numerical employee count or range midpoint. */
         employeeCount: number | null;
+        /** Financial bracket of annual revenue. */
         revenueRange: string | null;
+        /** Physical or legal geographic presence. */
         geography: string | null;
+        /** Current development stage (e.g., 'Scale-up'). */
         growthStage: string | null;
+        /** Whether funding was recently secured. */
         recentFunding: boolean | null;
     };
+    /** Key attributes of the specific human contact/buyer being analyzed. */
     buyer: {
+        /** Professional seniority level within their organization. */
         seniorityLevel: "IC" | "Manager" | "Director" | "VP" | "C-Level" | null;
+        /** Degree of formal authority in the purchasing decision. */
         decisionAuthority: "None" | "Influencer" | "Partial" | "Final" | null;
     };
 }
 
+/**
+ * Calculates a weighted ICP Fit Score (0-100) based on company and buyer inputs.
+ * The score is split 50/50 between organizational fit and individual contact authority.
+ * 
+ * @param {IcpInputs} inputs - The raw data points for the contact and company.
+ * @returns {Object} Result containing total score, factor breakdown, and confidence level.
+ */
 export function calculateIcpScore(inputs: IcpInputs) {
     let score = 0;
     const breakdown: { label: string; delta: number }[] = [];
@@ -103,11 +122,16 @@ export function calculateIcpScore(inputs: IcpInputs) {
     return { score, breakdown, confidence };
 }
 
-// Helpers for mapped extraction
+/**
+ * Parses a string representation of company size into a numeric value (midpoint).
+ * 
+ * @param {string} sizeStr - Raw size string (e.g., '200-500').
+ * @returns {number} Midpoint of the range or first integer found.
+ * @private
+ */
 function parseSizeToTotal(sizeStr: string): number {
     const match = sizeStr.match(/(\d+)/);
     if (match) {
-        // "500-1000" matches "500", consider mid-point or max for simplicity
         const nums = sizeStr.match(/(\d+)/g);
         if (nums && nums.length > 1) {
             return (parseInt(nums[0], 10) + parseInt(nums[1], 10)) / 2;
@@ -117,15 +141,29 @@ function parseSizeToTotal(sizeStr: string): number {
     return 0;
 }
 
+/**
+ * Maps a professional role string to a standardized seniority level.
+ * 
+ * @param {string} roleStr - Job title string.
+ * @returns {string} One of C-Level, VP, Director, Manager, IC.
+ * @private
+ */
 function parseRoleToSeniority(roleStr: string): IcpInputs["buyer"]["seniorityLevel"] {
     const r = roleStr.toLowerCase();
     if (r.includes("chief") || r.includes("ceo") || r.includes("cro") || r.includes("cfo") || r.includes("founder")) return "C-Level";
     if (r.includes("vp") || r.includes("vice")) return "VP";
     if (r.includes("director") || r.includes("head")) return "Director";
     if (r.includes("manager") || r.includes("lead")) return "Manager";
-    return "IC"; // individual contributor
+    return "IC";
 }
 
+/**
+ * Maps a qualitative influence string to a decision authority level.
+ * 
+ * @param {string} [influence] - Qualitative influence score (High/Medium/Low).
+ * @returns {string} One of Final, Partial, Influencer, None.
+ * @private
+ */
 function parseInfluenceToAuthority(influence?: string): IcpInputs["buyer"]["decisionAuthority"] {
     if (influence === "High") return "Final";
     if (influence === "Medium") return "Partial";
@@ -134,7 +172,11 @@ function parseInfluenceToAuthority(influence?: string): IcpInputs["buyer"]["deci
 }
 
 /**
- * Computes ICP and timing signal scores from dashboard data.
+ * High-level orchestration function that computes all profile scoring metrics.
+ * Extracts relevant signals from raw dashboard data and pipes them into the specific scoring engines.
+ * 
+ * @param {DashboardData} data - The normalized dashboard data object.
+ * @returns {Object} Composite score object including ICP fit and strategic timing signals.
  */
 export function calculateScores(data: DashboardData) {
     const authorityProfile = data.stakeholders?.find(s => s.name === data.identity?.name);

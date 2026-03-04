@@ -1,13 +1,26 @@
+/**
+ * Props for the ChecklistItem component.
+ */
 interface ChecklistItemProps {
+    /** The main text to display for the item. */
     label: string;
+    /** Optional supporting text or description. */
     description?: string;
+    /** 
+     * Whether the item is checked. 
+     * @default true
+     */
     checked?: boolean;
+    /** Additional CSS classes for the container. */
     className?: string;
 }
 
 /**
  * A checklist-style row with a check/unchecked icon, label, and sub-description.
  * Used in Urgency Drivers, buying process steps, etc.
+ * 
+ * @param {ChecklistItemProps} props - The component props.
+ * @returns {JSX.Element} The rendered ChecklistItem component.
  */
 export function ChecklistItem({ label, description, checked = true, className = '' }: ChecklistItemProps) {
     return (

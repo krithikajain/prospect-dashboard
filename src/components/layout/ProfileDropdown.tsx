@@ -1,7 +1,10 @@
 import { useState } from 'react';
 
 /**
- * User avatar button with a dropdown menu (Saved Prospects, Profile, Sign Out).
+ * Top-right fixed user profile component.
+ * Displays the current user's avatar and provides a dropdown menu for profile-related actions.
+ * 
+ * @returns {JSX.Element} The rendered ProfileDropdown component.
  */
 export function ProfileDropdown() {
     const [isOpen, setIsOpen] = useState(false);
@@ -33,11 +36,20 @@ export function ProfileDropdown() {
     );
 }
 
+/**
+ * A reusable action item within the profile dropdown menu.
+ * 
+ * @param {Object} props - The component props.
+ * @param {string} props.icon - Google Material Symbols icon name.
+ * @param {string} props.label - Text to display in the menu.
+ * @param {boolean} [props.danger] - Whether to use red 'danger' styling for the item.
+ * @returns {JSX.Element} The rendered DropdownItem component.
+ */
 function DropdownItem({ icon, label, danger = false }: { icon: string; label: string; danger?: boolean }) {
     return (
         <button className={`w-full text-left px-5 py-2.5 text-sm flex items-center gap-3 transition-colors ${danger
-                ? 'text-red-600 hover:bg-red-50'
-                : 'text-gray-700 hover:bg-slate-50 hover:text-black'
+            ? 'text-red-600 hover:bg-red-50'
+            : 'text-gray-700 hover:bg-slate-50 hover:text-black'
             }`}>
             <span className="material-symbols-outlined text-[18px]">{icon}</span>
             {label}
