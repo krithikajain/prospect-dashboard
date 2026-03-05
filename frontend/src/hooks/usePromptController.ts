@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useProspecting, type SalesIntelligenceContract } from '@/context/ProspectingContext';
+import { useProspecting } from '@/context/ProspectingContext';
 
 /**
  * Custom hook to manage lazy-loading of tab data.
@@ -75,17 +75,35 @@ async function fetchTabData(
     tabName: 'profile' | 'power' | 'pain' | 'path',
     context: { identity: any, organization: any }
 ) {
-    console.log(`[Prompt Execution] Context passed for '${tabName}':`, context);
+    console.log(`[Prompt Execution] Context requested for '${tabName}':`, context);
 
-    // Simulate network delay (1.5 seconds)
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            console.log(`[Prompt Execution] Successfully generated data for '${tabName}'.`);
-            resolve({
-                _loaded_at: new Date().toISOString(),
-                _source: 'Mock LLM Response',
-                note: `This is dummy lazy-loaded data for the ${tabName} tab.`
-            });
-        }, 1500);
-    });
+    try {
+        const response = await fetch(`http://localhost:8000/api/prospect/${tabName}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(context)
+        });
+
+        if (!response.ok) {
+            throw new Error(`Backend fetch failed with status ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        // Log the production generation metadata but we don't strictly need it in SSoT slice
+        if (data._meta) {
+            console.log(`[LLM Response Meta] Generated in ${data._meta.generatedAt} using ${data._meta.modelVersion}`);
+        }
+
+        // Return the specific tab's generated payload
+        return data[tabName];
+
+    } catch (e) {
+        console.error(`[Prompt Execution] Failed to generate data for '${tabName}':`, e);
+        // Fallback for development if backend isn't running
+        return {
+            _error: "Backend unavailable",
+            note: "Start the python backend: `cd backend && uvicorn main:app`"
+        };
+    }
 }

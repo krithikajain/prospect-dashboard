@@ -1,22 +1,11 @@
 import React, { createContext, useContext, useState, type ReactNode } from 'react';
-
-// The Master State structure (SalesIntelligenceContract)
-export interface SalesIntelligenceContract {
-    identity: any | null;
-    organization: any | null;
-    insights: {
-        profile?: any;
-        power?: any;
-        pain?: any;
-        path?: any;
-    } | null;
-}
+import type { ProspectIntelligence } from '../contracts';
 
 // Context shape
 interface ProspectingContextType {
-    prospectingData: SalesIntelligenceContract;
-    setProspectingData: React.Dispatch<React.SetStateAction<SalesIntelligenceContract>>;
-    updateInsightData: (tabName: keyof SalesIntelligenceContract['insights'], data: any) => void;
+    prospectingData: ProspectIntelligence;
+    setProspectingData: React.Dispatch<React.SetStateAction<ProspectIntelligence>>;
+    updateInsightData: (tabName: keyof NonNullable<ProspectIntelligence['insights']>, data: any) => void;
 }
 
 // Create the Context with a default empty state
@@ -25,7 +14,7 @@ const ProspectingContext = createContext<ProspectingContextType | undefined>(und
 // Props for the Provider component
 interface DashboardContainerProps {
     children: ReactNode;
-    initialData?: Partial<SalesIntelligenceContract>;
+    initialData?: Partial<ProspectIntelligence>;
 }
 
 /**
@@ -34,7 +23,7 @@ interface DashboardContainerProps {
  */
 export const DashboardContainer: React.FC<DashboardContainerProps> = ({ children, initialData }) => {
     // Initialize the master state
-    const [prospectingData, setProspectingData] = useState<SalesIntelligenceContract>({
+    const [prospectingData, setProspectingData] = useState<ProspectIntelligence>({
         identity: initialData?.identity || null,
         organization: initialData?.organization || null,
         insights: initialData?.insights || null,
@@ -43,7 +32,7 @@ export const DashboardContainer: React.FC<DashboardContainerProps> = ({ children
     /**
      * Helper to update specific insight data (e.g., when a tab lazy-loads its content)
      */
-    const updateInsightData = (tabName: keyof NonNullable<SalesIntelligenceContract['insights']>, data: any) => {
+    const updateInsightData = (tabName: keyof NonNullable<ProspectIntelligence['insights']>, data: any) => {
         setProspectingData((prev) => ({
             ...prev,
             insights: {
