@@ -42,7 +42,27 @@ export function IcpScoreCard({ score, breakdown = [], confidence = "Medium" }: I
     return (
         <Card className={`flex flex-col shrink-0 p-6 pt-5 min-h-[160px] border shadow-sm transition-colors duration-300 ${bgStyle}`}>
             <div className="flex justify-between items-center mb-1">
-                <p className="text-xs font-bold text-gray-500 tracking-[0.15em] uppercase">ICP Fit Score</p>
+                <div className="flex items-center gap-1.5 relative group/tooltip cursor-help">
+                    <p className="text-xs font-bold text-gray-500 tracking-[0.15em] uppercase">ICP Fit Score</p>
+                    <span className="material-symbols-outlined text-[14px] text-gray-400">info</span>
+
+                    {/* Tooltip Content */}
+                    <div className="absolute left-0 top-full mt-2 hidden group-hover/tooltip:block w-[280px] p-4 bg-slate-900 rounded-xl shadow-2xl text-[12px] text-gray-300 z-50 animate-in fade-in zoom-in-95 duration-200">
+                        <div className="font-semibold text-white text-sm mb-2 pb-2 border-b border-gray-700">Calculation Logic</div>
+                        <div className="space-y-1.5 font-medium">
+                            {breakdown.length === 0 ? (
+                                <div className="text-gray-400 text-xs italic">No data factors matched.</div>
+                            ) : (
+                                breakdown.map((item, idx) => (
+                                    <div key={idx} className="flex justify-between gap-4">
+                                        <span>{item.label}:</span>
+                                        <span className="text-emerald-400">+{item.delta}</span>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
+                </div>
                 <StatusTag
                     label={`${confidence} Confidence`}
                     variant={variant as StatusVariant}
@@ -52,26 +72,7 @@ export function IcpScoreCard({ score, breakdown = [], confidence = "Medium" }: I
             </div>
 
             <div className="flex flex-wrap items-center justify-between gap-4 mb-10 relative z-10 w-full">
-                <ScoreDisplay
-                    score={score}
-                    tooltip={
-                        <>
-                            <div className="font-semibold text-white text-sm mb-2 pb-2 border-b border-gray-700">Calculation Logic</div>
-                            <div className="space-y-1.5 font-medium">
-                                {breakdown.length === 0 ? (
-                                    <div className="text-gray-400 text-xs italic">No data factors matched.</div>
-                                ) : (
-                                    breakdown.map((item, idx) => (
-                                        <div key={idx} className="flex justify-between gap-4">
-                                            <span>{item.label}:</span>
-                                            <span className="text-emerald-400">+{item.delta}</span>
-                                        </div>
-                                    ))
-                                )}
-                            </div>
-                        </>
-                    }
-                />
+                <ScoreDisplay score={score} />
             </div>
 
             <div className="flex flex-wrap items-center gap-2 mt-auto">

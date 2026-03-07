@@ -1,7 +1,22 @@
 import { useState } from 'react';
 
-export function Stage0Home() {
+interface HomeStageProps {
+    onExplore?: (email: string) => void;
+}
+
+export function Stage0Home({ onExplore }: HomeStageProps) {
     const [showEmailInput, setShowEmailInput] = useState(false);
+    const [email, setEmail] = useState('');
+
+    const handleExplore = () => {
+        if (!showEmailInput) {
+            setShowEmailInput(true);
+            return;
+        }
+        if (email.trim() && onExplore) {
+            onExplore(email);
+        }
+    };
 
     return (
         <div className="w-full flex flex-col relative h-[calc(100vh-140px)]">
@@ -21,16 +36,24 @@ export function Stage0Home() {
                             {showEmailInput && (
                                 <input
                                     type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
                                     placeholder="Enter prospect's email"
                                     autoFocus
                                     className="w-full max-w-[320px] px-6 py-4 rounded-full border border-gray-200 text-sm focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900 transition-all bg-gray-50/50 shadow-inner"
                                     onKeyDown={(e) => {
-                                        if (e.key === 'Escape') setShowEmailInput(false);
+                                        if (e.key === 'Escape') {
+                                            setShowEmailInput(false);
+                                            setEmail('');
+                                        }
+                                        if (e.key === 'Enter') {
+                                            handleExplore();
+                                        }
                                     }}
                                 />
                             )}
                             <button
-                                onClick={() => setShowEmailInput(true)}
+                                onClick={handleExplore}
                                 className="bg-slate-900 text-white px-8 py-4 rounded-full font-medium flex items-center space-x-3 hover:opacity-90 transition-all group shadow-sm"
                             >
                                 <span>Explore Prospects</span>

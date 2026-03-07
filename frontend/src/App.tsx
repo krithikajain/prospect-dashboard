@@ -3,9 +3,7 @@ import { useState, type ReactNode } from 'react';
 // Configuration
 import { NAV_CONFIG } from '@/config/navigation';
 
-// Mock Data & Normalizer
-import rawData from '@/data/studio_results_20260212_1512.json';
-import { normalizeProspectData } from '@/lib/normalizer';
+// Mock Data & Normalizer (Removed unused)
 
 // Providers & Components
 import { DashboardContainer } from '@/context/ProspectingContext';
@@ -29,6 +27,7 @@ import {
 
 // Hooks
 import { usePromptController } from '@/hooks/usePromptController';
+import { useProspecting } from '@/context/ProspectingContext';
 
 /**
  * Main Entry Point
@@ -37,15 +36,10 @@ import { usePromptController } from '@/hooks/usePromptController';
  * and passes controls to the DashboardLayout shell.
  */
 export default function App() {
-    // Normalization should happen at the top level to pass to standard SSoT (Single Source of Truth)
-    const initialNormalizedData = normalizeProspectData(rawData[0]);
-
+    // Start with empty state or null to represent "no prospect selected yet"
     return (
-        <DashboardContainer initialData={{
-            identity: initialNormalizedData.identity,
-            organization: initialNormalizedData.profile_fit?.company
-        }}>
-            <DashboardContent data={initialNormalizedData} />
+        <DashboardContainer>
+            <DashboardContent />
         </DashboardContainer>
     );
 }
@@ -53,13 +47,16 @@ export default function App() {
 /**
  * Logic-heavy component separated from providers for clarity.
  */
-function DashboardContent({ data }: { data: any }) {
+function DashboardContent({ data }: { data?: any }) {
     // Application core state for navigation
     const [activeSection, setActiveSection] = useState<string>('home');
     const [activeTab, setActiveTab] = useState<string>('profile');
 
     // Dynamic data fetching controller (LLM/API)
     const { handleTabChange: fetchDynamicTabData, isLoading } = usePromptController();
+
+    // SSoT State Controller
+    const { setProspectingData } = useProspecting();
 
     /**
      * Handles top-level sidebar navigation changes.
@@ -83,6 +80,51 @@ function DashboardContent({ data }: { data: any }) {
     };
 
     /**
+     * Simulate searching for a prospect and pushing context to SSoT.
+     * Passes the fresh identity directly to the tab fetcher to avoid
+     * the React stale-closure race between setState and navigation.
+     */
+    const handleExplore = (email: string) => {
+        const prefix = email.split('@')[0];
+        const domain = email.split('@')[1]?.split('.')[0] || 'Company';
+        const defaultName = prefix.replace('.', ' ').replace(/^./, c => c.toUpperCase());
+        const defaultCompany = domain.replace(/^./, c => c.toUpperCase());
+
+        let freshIdentity = {
+            fullName: defaultName,
+            currentRole: 'Executive',
+            companyName: defaultCompany,
+            email: email
+        };
+
+        if (email.toLowerCase().includes('satya')) {
+            freshIdentity = { fullName: 'Satya Nadella', currentRole: 'CEO', companyName: 'Microsoft', email };
+        } else if (email.toLowerCase().includes('kholmes')) {
+            freshIdentity = { fullName: 'Kevin Holmes', currentRole: 'VP of Product Strategy', companyName: 'Salesforce', email };
+        } else if (email.toLowerCase().includes('benioff')) {
+            freshIdentity = { fullName: 'Marc Benioff', currentRole: 'CEO', companyName: 'Salesforce', email };
+        }
+
+        // 1. Wipe previous insights and update identity in SSoT
+        setProspectingData({
+            identity: freshIdentity as any,
+            organization: null,
+            insights: null
+        });
+
+        // 2. Navigate to Prospect section + trigger the fetch immediately
+        //    with fresh context (bypassing the stale SSoT state)
+        setActiveSection('prospect');
+        setActiveTab('profile');
+
+        // 3. Fire the LLM fetch directly with fresh context (no stale closure)
+        fetchDynamicTabData('profile', {
+            identity: freshIdentity,
+            organization: null
+        });
+    };
+
+    /**
      * Registry-based rendering logic for dynamic stage views.
      */
     const renderStageView = () => {
@@ -92,7 +134,7 @@ function DashboardContent({ data }: { data: any }) {
         }
 
         // 2. Section: Home
-        if (activeSection === 'home') return <Stage0Home />;
+        if (activeSection === 'home') return <Stage0Home onExplore={handleExplore} />;
 
         // 3. Section: Prospect (Sales Insights)
         if (activeSection === 'prospect') {

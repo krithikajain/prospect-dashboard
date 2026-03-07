@@ -1,18 +1,19 @@
 import { useState } from 'react';
 import { Card } from '@/shared/components/Card';
+import { useProspecting } from '@/context/ProspectingContext';
 
 /** 
  * Mock static career history data used for the horizontal timeline visualization. 
  * @private
  */
 const careerData = [
-    { year: '2020 - Present', role: 'CEO', company: 'Acme Corp', isCurrent: true },
-    { year: '2019 - 2020', role: 'CRO', company: 'Tech Inc' },
-    { year: '2017 - 2019', role: 'VP Sales', company: 'Salesforce' },
-    { year: '2016 - 2017', role: 'Director', company: 'Salesforce' },
-    { year: '2015 - 2016', role: 'Mid-Market AE', company: 'Okta' },
-    { year: '2014 - 2015', role: 'Account Exec', company: 'Okta' },
-    { year: '2013 - 2014', role: 'SDR', company: 'Oracle' },
+    { period: '2020 - Present', role: 'CEO', company: 'Acme Corp', isCurrent: true },
+    { period: '2019 - 2020', role: 'CRO', company: 'Tech Inc' },
+    { period: '2017 - 2019', role: 'VP Sales', company: 'Salesforce' },
+    { period: '2016 - 2017', role: 'Director', company: 'Salesforce' },
+    { period: '2015 - 2016', role: 'Mid-Market AE', company: 'Okta' },
+    { period: '2014 - 2015', role: 'Account Exec', company: 'Okta' },
+    { period: '2013 - 2014', role: 'SDR', company: 'Oracle' },
 ];
 
 /**
@@ -24,6 +25,12 @@ const careerData = [
  */
 export function ProfessionalJourney() {
     const [tab, setTab] = useState<'Workspace' | 'Education'>('Workspace');
+    const { prospectingData } = useProspecting();
+    const journey = prospectingData.insights?.profile?.professionalJourney;
+
+    // Use SSoT data, or fallback to mock data if not available (for skeleton/dev states)
+    const careerList = journey?.career?.length ? journey.career : careerData;
+    const educationList = journey?.education?.length ? journey.education : [];
 
     return (
         <Card padding="sm" className="flex flex-col h-full overflow-hidden">
@@ -48,7 +55,7 @@ export function ProfessionalJourney() {
 
             {/* Tab Content */}
             <div className="flex-1 min-h-[200px] flex flex-col justify-end relative">
-                {tab === 'Workspace' ? <WorkspaceTab /> : <EducationTab />}
+                {tab === 'Workspace' ? <WorkspaceTab careerList={careerList} /> : <EducationTab educationList={educationList} />}
             </div>
         </Card>
     );
@@ -62,21 +69,21 @@ export function ProfessionalJourney() {
  * 
  * @returns {JSX.Element} The rendered WorkspaceTab component.
  */
-function WorkspaceTab() {
+function WorkspaceTab({ careerList }: { careerList: any[] }) {
     return (
-        <div className="w-full flex-1 relative z-10 flex flex-col justify-center animate-in fade-in slide-in-from-bottom-2 duration-500 px-2 mt-4 pb-2">
-            <div className="relative flex justify-between items-center w-full">
+        <div className="w-full flex-1 relative z-10 flex flex-col justify-center animate-in fade-in slide-in-from-bottom-2 duration-500 px-2 mt-4 pb-2 overflow-x-auto scroolbar-hide">
+            <div className="relative flex justify-between items-center w-full min-w-max md:min-w-full">
                 {/* Connecting Horizontal Line */}
                 <div className="absolute left-[5%] right-[5%] top-1/2 -translate-y-1/2 h-0.5 bg-slate-100 z-0"></div>
 
-                {careerData.map((item, idx) => (
+                {careerList.map((item, idx) => (
                     <div key={idx} className="relative z-10 flex flex-col items-center group flex-1 cursor-pointer">
 
                         {/* Hover Year Tooltip */}
                         <div className="absolute bottom-full mb-10 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 pointer-events-none z-50">
                             <div className="bg-slate-800 text-white text-[10px] font-bold px-2.5 py-1 rounded shadow-lg whitespace-nowrap flex items-center gap-1">
                                 <span className="material-symbols-outlined text-[12px] text-blue-400">history</span>
-                                {item.year}
+                                {item.period || item.year}
                             </div>
                             <div className="w-2 h-2 bg-slate-800 rotate-45 absolute -bottom-1 left-1/2 -translate-x-1/2"></div>
                         </div>
@@ -116,11 +123,27 @@ function WorkspaceTab() {
  * 
  * @returns {JSX.Element} The rendered EducationTab component.
  */
-function EducationTab() {
+function EducationTab({ educationList }: { educationList: any[] }) {
+    if (!educationList.length) {
+        return (
+            <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm italic py-10">
+                Education information not available
+            </div>
+        );
+    }
+
     return (
         <div className="w-full mt-2 flex flex-col gap-0 relative z-10 animate-in fade-in slide-in-from-bottom-2 duration-500">
-            <EducationEntry degree="Master of Business Administration (MBA)" school="Stanford University Graduate School of Business" year="Class of 2010" icon="account_balance" />
-            <EducationEntry degree="B.S. in Computer Science" school="University of California, Berkeley" year="Class of 2005" icon="school" borderTop />
+            {educationList.map((edu, idx) => (
+                <EducationEntry
+                    key={idx}
+                    degree={edu.degree}
+                    school={edu.school}
+                    year={edu.year}
+                    icon={idx === 0 ? "account_balance" : "school"}
+                    borderTop={idx > 0}
+                />
+            ))}
         </div>
     );
 }

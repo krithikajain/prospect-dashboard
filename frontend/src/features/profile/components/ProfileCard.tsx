@@ -11,18 +11,22 @@ interface ProfileCardProps {
     company: string;
     /** Professional job title. */
     role: string;
+    /** URL to the prospect's profile image. */
+    imageUrl?: string;
     /** Area of functional ownership or expertise. */
     functionalOwnership?: string;
     /** Array of descriptive personality or skill tags. */
     personalityTags: string[];
     /** Direct email address (optional). */
-    email?: string;
+    email?: string | null;
     /** Link to personal or company website (optional). */
-    website?: string;
+    website?: string | null;
     /** Qualitative summary of online presence (podcasts, articles). */
-    digitalFootprint?: string;
+    digitalFootprint?: string | null;
     /** Summary of recent news involving the prospect. */
-    recentNews?: string;
+    recentNews?: string | null;
+    /** LLM-generated latest mentions array. */
+    latestMentions?: Array<{ type: string; title: string; summary: string; url?: string | null }> | null;
 }
 
 /**
@@ -34,10 +38,14 @@ interface ProfileCardProps {
  * @returns {JSX.Element} The rendered ProfileCard component.
  */
 export function ProfileCard({
-    name, company, role, functionalOwnership,
-    personalityTags, email, website, digitalFootprint, recentNews,
+    name, company, role, imageUrl, functionalOwnership,
+    personalityTags, email, website, digitalFootprint, recentNews, latestMentions,
 }: ProfileCardProps) {
     const [isFlipped, setIsFlipped] = useState(false);
+
+    // Default placeholder images matching original display aesthetic
+    const defaultFrontImage = "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8Y2VvfGVufDB8fDB8fHww";
+    const defaultBackImage = "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=800&q=80";
 
     return (
         <Card padding="none" className="relative overflow-hidden flex-1 min-h-[420px] lg:min-h-[460px] flex flex-col border-none shadow-xl rounded-[24px] perspective-1000">
@@ -47,6 +55,8 @@ export function ProfileCard({
                     name={name}
                     company={company}
                     role={role}
+                    imageUrl={imageUrl}
+                    defaultImageUrl={defaultFrontImage}
                     functionalOwnership={functionalOwnership}
                     personalityTags={personalityTags}
                     onFlip={() => setIsFlipped(true)}
@@ -59,8 +69,10 @@ export function ProfileCard({
                     company={company}
                     email={email}
                     website={website}
+                    defaultImageUrl={defaultBackImage}
                     digitalFootprint={digitalFootprint}
                     recentNews={recentNews}
+                    latestMentions={latestMentions}
                     onFlip={() => setIsFlipped(false)}
                     isFlipped={isFlipped}
                 />
@@ -78,6 +90,8 @@ interface FrontFaceProps {
     name: string;
     company: string;
     role: string;
+    imageUrl?: string;
+    defaultImageUrl: string;
     functionalOwnership?: string;
     personalityTags: string[];
     onFlip: () => void;
@@ -91,10 +105,22 @@ interface FrontFaceProps {
  * @param {FrontFaceProps} props - The component props.
  * @returns {JSX.Element} The rendered FrontFace component.
  */
-function FrontFace({ name, company, role, functionalOwnership, personalityTags, onFlip, isFlipped }: FrontFaceProps) {
+function FrontFace({ name, company, role, imageUrl, defaultImageUrl, functionalOwnership, personalityTags, onFlip, isFlipped }: FrontFaceProps) {
+    const [imgError, setImgError] = useState(false);
+    const displayImage = imgError ? null : (imageUrl || defaultImageUrl);
+
     return (
         <div className={`absolute inset-0 backface-hidden w-full h-full flex flex-col justify-end transition-opacity duration-300 ${isFlipped ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-auto'}`}>
-            <img alt={name} className="absolute inset-0 w-full h-full object-cover object-top" src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8Y2VvfGVufDB8fDB8fHww" />
+            {displayImage ? (
+                <img
+                    alt={name}
+                    className="absolute inset-0 w-full h-full object-cover object-top"
+                    src={displayImage}
+                    onError={() => setImgError(true)}
+                />
+            ) : (
+                <div className="absolute inset-0 w-full h-full bg-[#0a0a0a]" />
+            )}
             <div className="absolute inset-x-0 bottom-0 h-full bg-gradient-to-t from-[#161616] via-[#161616]/40 to-transparent" />
             <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-[#161616] to-transparent" />
 
@@ -140,10 +166,12 @@ function FrontFace({ name, company, role, functionalOwnership, personalityTags, 
 interface BackFaceProps {
     name: string;
     company: string;
-    email?: string;
-    website?: string;
-    digitalFootprint?: string;
-    recentNews?: string;
+    email?: string | null;
+    website?: string | null;
+    defaultImageUrl: string;
+    digitalFootprint?: string | null;
+    recentNews?: string | null;
+    latestMentions?: Array<{ type: string; title: string; summary: string; url?: string | null }> | null;
     onFlip: () => void;
     isFlipped: boolean;
 }
@@ -155,10 +183,21 @@ interface BackFaceProps {
  * @param {BackFaceProps} props - The component props.
  * @returns {JSX.Element} The rendered BackFace component.
  */
-function BackFace({ name, company, email, website, digitalFootprint, recentNews, onFlip, isFlipped }: BackFaceProps) {
+function BackFace({ name, company, email, website, defaultImageUrl, digitalFootprint, recentNews, latestMentions, onFlip, isFlipped }: BackFaceProps) {
+    // Map mention type → icon name + color
+    const mentionIcon = (type: string) => {
+        switch (type) {
+            case 'podcast': return { icon: 'podcasts', color: 'text-red-400' };
+            case 'video': return { icon: 'smart_display', color: 'text-gray-300', isYt: true };
+            case 'article': return { icon: 'article', color: 'text-blue-400' };
+            case 'webinar': return { icon: 'record_voice_over', color: 'text-purple-400' };
+            case 'social': return { icon: 'share', color: 'text-green-400' };
+            default: return { icon: 'article', color: 'text-blue-400' };
+        }
+    };
     return (
         <div className={`absolute inset-0 backface-hidden w-full h-full [transform:rotateY(180deg)] flex flex-col transition-opacity duration-300 ${!isFlipped ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-auto'}`}>
-            <img alt={name} className="absolute inset-0 w-full h-full object-cover opacity-20" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=800&q=80" />
+            <img alt={name} className="absolute inset-0 w-full h-full object-cover opacity-20" src={defaultImageUrl} />
             <div className="absolute inset-0 bg-[#1A1C20]/95 backdrop-blur-xl" />
 
             <div className="absolute inset-0 p-5 text-white flex flex-col">
@@ -188,11 +227,30 @@ function BackFace({ name, company, email, website, digitalFootprint, recentNews,
                 {/* Mentions */}
                 <div className="flex-1 overflow-y-auto pr-1 -mr-1 space-y-3 pb-2">
                     <h4 className="text-[9px] uppercase tracking-widest text-gray-500 font-bold mb-2">Latest Mentions</h4>
-                    {digitalFootprint && (
-                        <MentionLink icon="podcasts" iconColor="text-red-400" title="Recent Interview" text={digitalFootprint} />
-                    )}
-                    <MentionLink icon="article" iconColor="text-blue-400" title="Company News" text={recentNews || `${company} announces major strategic shifts in their latest press release, focusing heavily on operational scalability.`} />
-                    <MentionLink icon="smart_display" iconColor="text-gray-300" title="YouTube Panel" text="Speaking at SaaStr Annual on 'Scaling Go-To-Market Strategies in the Current Era'." isYoutube />
+                    {latestMentions && latestMentions.length > 0
+                        ? latestMentions.map((m, i) => {
+                            const { icon, color, isYt } = mentionIcon(m.type) as any;
+                            return (
+                                <MentionLink
+                                    key={i}
+                                    icon={icon}
+                                    iconColor={color}
+                                    title={m.title}
+                                    text={m.summary}
+                                    isYoutube={isYt}
+                                />
+                            );
+                        })
+                        : (
+                            <>
+                                {digitalFootprint && (
+                                    <MentionLink icon="podcasts" iconColor="text-red-400" title="Recent Interview" text={digitalFootprint} />
+                                )}
+                                <MentionLink icon="article" iconColor="text-blue-400" title="Company News" text={recentNews || `${company} announces major strategic shifts.`} />
+                                <MentionLink icon="smart_display" iconColor="text-gray-300" title="YouTube Panel" text="Speaking at SaaStr Annual on 'Scaling Go-To-Market Strategies'." isYoutube />
+                            </>
+                        )
+                    }
                 </div>
             </div>
         </div>

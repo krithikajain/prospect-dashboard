@@ -1,4 +1,4 @@
-from typing import Optional, Literal
+from typing import List, Optional, Literal
 from pydantic import BaseModel, Field
 
 # ─── Global Enums (Shared Design Tokens) ─────────────────────────────────────
@@ -16,6 +16,24 @@ RevenueRange = Literal[
 ]
 MentionType = Literal["podcast", "article", "video", "webinar", "social"]
 
+# ─── Seller Onboarding Enums ──────────────────────────────────────────────────
+# These map 1:1 to the pre-specified dropdown / chip options in the onboarding UI.
+
+ProductCategory = Literal[
+    "AI/ML", "Sales Intelligence", "CRM", "Marketing Automation",
+    "DevTools", "FinTech", "Security", "Data/Analytics", "HR Tech", "Other"
+]
+
+CompanySizeRange = Literal[
+    "Startup (1-50)", "SMB (51-200)", "Mid-Market (201-1000)",
+    "Enterprise (1001-5000)", "Large Enterprise (5000+)"
+]
+
+IndustryVertical = Literal[
+    "SaaS", "FinTech", "E-commerce", "Healthcare", "Manufacturing",
+    "Professional Services", "Media", "Education", "Government"
+]
+
 # ─── Response Metadata ────────────────────────────────────────────────────────
 
 class ResponseMeta(BaseModel):
@@ -24,6 +42,26 @@ class ResponseMeta(BaseModel):
     modelVersion: Optional[str] = Field(None, description="Identifier of the LLM model used")
     traceId: str = Field(description="Unique trace ID for correlating logs")
     cacheStatus: Literal["hit", "miss", "stale"] = Field(description="Cache status indicator")
+
+# ─── Seller Context (The User / Sales Rep) ────────────────────────────────────
+# Collected at onboarding. In demo mode, loaded from config/demo_seller.py.
+# In production, loaded from DB after authentication.
+
+class SellerContext(BaseModel):
+    """Who is using the app — the sales rep and their company."""
+    sellerName: str = Field(description="The sales rep's display name")
+    sellerEmail: str = Field(description="The sales rep's email (account identity)")
+    companyName: str = Field(description="The seller's company name")
+    productCategory: ProductCategory = Field(description="What category of product they sell")
+    # Optional — seller can skip these during onboarding
+    targetCompanySize: List[CompanySizeRange] = Field(
+        default_factory=list,
+        description="Preferred target company sizes (empty = no preference)"
+    )
+    targetIndustries: List[IndustryVertical] = Field(
+        default_factory=list,
+        description="Preferred target industries (empty = no preference)"
+    )
 
 # ─── Core Identity (For Backend Construction) ─────────────────────────────────
 
@@ -52,3 +90,4 @@ class PromptContext(BaseModel):
     """The normalized data payload passed to prompt builders."""
     identity: Optional[IdentityContext] = None
     organization: Optional[OrganizationContext] = None
+    seller: Optional[SellerContext] = None

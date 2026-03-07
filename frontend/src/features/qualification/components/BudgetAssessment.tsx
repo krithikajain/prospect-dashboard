@@ -1,4 +1,4 @@
-import { Card, CardHeader, MetricBox, StatusTag, InfoRow, ChecklistItem } from '@/components/ui';
+import { Card, CardHeader, MetricBox, StatusTag, InfoRow, ChecklistItem } from '@/shared/components';
 import { themeVariants, glassVariants } from '@/lib/theme';
 
 /**

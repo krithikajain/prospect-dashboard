@@ -1,9 +1,9 @@
 import type { DashboardData } from '@/types/dashboard';
 import { evaluateTimeline } from '@/lib/domain/timelineEvaluation';
-import { CompellingEventsStrip } from './timeline/CompellingEventsStrip';
-import { BuyingPhaseAndVelocity } from './timeline/BuyingPhaseAndVelocity';
-import { ImplementationReadiness } from './timeline/ImplementationReadiness';
-import { ProcurementArchitecture } from './timeline/ProcurementArchitecture';
+import { CompellingEventsStrip } from '@/features/velocity/components/CompellingEventsStrip';
+import { BuyingPhaseAndVelocity } from '@/features/velocity/components/BuyingPhaseAndVelocity';
+import { ImplementationReadiness } from '@/features/velocity/components/ImplementationReadiness';
+import { ProcurementArchitecture } from '@/features/velocity/components/ProcurementArchitecture';
 /**
  * Timeline Deep Dive — BANT Qualification (T).
  * Executive Grade Refinement: 

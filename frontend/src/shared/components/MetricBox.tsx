@@ -8,6 +8,8 @@ interface MetricBoxProps {
     label: string;
     /** The main numeric or text value to display prominently. */
     value: string;
+    /** Optional secondary text to display below the main value. */
+    subValue?: string;
     /** Optional trend data showing an up/down arrow and a label. */
     trend?: {
         /** The direction of the trend arrow. */
@@ -23,6 +25,8 @@ interface MetricBoxProps {
     smallIcon?: string;
     /** Additional CSS classes for the container. */
     className?: string;
+    /** Optional override for the main value's text styling */
+    valueClassName?: string;
 }
 
 /**
@@ -32,7 +36,7 @@ interface MetricBoxProps {
  * @param {MetricBoxProps} props - The component props.
  * @returns {JSX.Element} The rendered MetricBox component.
  */
-export function MetricBox({ label, value, trend, chart, icon, smallIcon, className = '' }: MetricBoxProps) {
+export function MetricBox({ label, value, subValue, trend, chart, icon, smallIcon, className = '', valueClassName }: MetricBoxProps) {
     return (
         <div className={`bg-gray-50/80 border border-gray-100 rounded-2xl p-4 flex flex-col shadow-sm relative overflow-hidden ${className}`}>
             <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-2 relative z-10 w-full flex justify-between items-center">
@@ -49,7 +53,12 @@ export function MetricBox({ label, value, trend, chart, icon, smallIcon, classNa
                     </span>
                 )}
             </p>
-            <p className="text-2xl tracking-tight font-semibold text-slate-800 relative z-10">{value}</p>
+            <p className={`${valueClassName || (value.length > 12 ? 'text-[17px] sm:text-lg whitespace-normal leading-tight' : 'text-2xl whitespace-nowrap')} tracking-tight font-semibold text-slate-800 relative z-10`}>{value}</p>
+            {subValue && (
+                <p className="text-[11px] text-gray-500 mt-1 relative z-10 font-medium leading-[1.3] opacity-80 decoration-slate-200">
+                    {subValue}
+                </p>
+            )}
 
             {/* Optional decorative icon */}
             {icon && !chart && (

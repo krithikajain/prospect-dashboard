@@ -197,21 +197,9 @@ export function calculateScores(data: DashboardData) {
 
     const icpResult = calculateIcpScore(inputs);
 
-    // --- Strategic Timing Signal Logic ---
-    let timingSignal = 50;
-    const hiring = (data.profile_fit?.company?.hiring_trend || '').toLowerCase();
-    if (hiring.includes('hiring') || hiring.includes('growth') || hiring.includes('expanding')) timingSignal += 20;
-
-    const funding = (data.profile_fit?.company?.funding_status || '').toLowerCase();
-    if (funding.includes('raised') || funding.includes('series') || funding.includes('backed')) timingSignal += 15;
-
-    const news = data.profile_fit?.business?.recent_news || '';
-    if (news.length > 20) timingSignal += 10;
-
     return {
         icp: icpResult.score,
         icpBreakdown: icpResult.breakdown,
         icpConfidence: icpResult.confidence,
-        timingSignal: Math.min(timingSignal, 95),
     };
 }

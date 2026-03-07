@@ -1,6 +1,7 @@
-import { Card, CardHeader } from '@/shared/components/Card';
+import { Card } from '@/shared/components/Card';
 import type { DashboardData } from '@/types/dashboard';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { useState } from 'react';
 
 /**
  * Props for the KPIs component.
@@ -11,6 +12,12 @@ interface KPIsProps {
      * Contains historical revenue and margin data for charting.
      */
     kpis?: DashboardData['profile_fit']['business']['kpis'];
+
+    /**
+     * Optional disclaimer text for private company financials.
+     * When present, a ⓘ info button is shown that reveals the disclaimer on hover.
+     */
+    dataDisclaimer?: string | null;
 }
 
 /**
@@ -39,12 +46,51 @@ const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?:
  * @param {KPIsProps} props - The component props.
  * @returns {JSX.Element | null} The rendered KPIs component or null if no data is present.
  */
-export function KPIs({ kpis }: KPIsProps) {
+export function KPIs({ kpis, dataDisclaimer }: KPIsProps) {
+    const [showDisclaimer, setShowDisclaimer] = useState(false);
+
     if (!kpis) return null;
 
     return (
         <Card padding="sm" className="flex flex-col h-full hover:shadow-2xl transition-all duration-300">
-            <CardHeader icon="monitoring" title="KPIs" className="mb-2" />
+            <div className="flex items-center justify-between border-b border-border-light pb-4 mb-4">
+                <div className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-secondary-text">monitoring</span>
+                    <h3 className="text-sm font-bold tracking-widest uppercase">KPIs</h3>
+                </div>
+
+                {/* ── Audit-Proof Info Button ── */}
+                {dataDisclaimer && (
+                    <div
+                        className="relative"
+                        onMouseEnter={() => setShowDisclaimer(true)}
+                        onMouseLeave={() => setShowDisclaimer(false)}
+                    >
+                        <button
+                            type="button"
+                            className="flex items-center gap-1 px-2 py-1 rounded-lg text-amber-600 bg-amber-50 border border-amber-200 hover:bg-amber-100 transition-colors cursor-help"
+                            aria-label="Data source disclaimer"
+                        >
+                            <span className="material-symbols-outlined text-[16px]">info</span>
+                            <span className="text-[10px] font-bold uppercase tracking-wider hidden sm:inline">Estimated</span>
+                        </button>
+
+                        {/* Tooltip */}
+                        {showDisclaimer && (
+                            <div className="absolute right-0 top-full mt-2 z-50 w-72 sm:w-80 bg-white border border-amber-200 rounded-xl shadow-xl p-4 animate-in fade-in slide-in-from-top-1">
+                                <div className="flex items-start gap-2">
+                                    <span className="material-symbols-outlined text-amber-500 text-[18px] shrink-0 mt-0.5">warning</span>
+                                    <div>
+                                        <p className="text-[10px] font-bold uppercase tracking-widest text-amber-600 mb-1.5">Data Disclaimer</p>
+                                        <p className="text-xs text-slate-600 leading-relaxed">{dataDisclaimer}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
+
             <div className="flex-1 mt-2">
                 <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-3 block">Revenue Growth (5Y)</span>
                 <div className="h-[140px] w-full">

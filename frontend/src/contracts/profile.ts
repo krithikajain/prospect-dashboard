@@ -26,7 +26,6 @@ import type {
     ConfidenceLevel,
     TrendDirection,
     HiringTrend,
-    GrowthStage,
     RevenueRange,
     MentionType,
 } from './base';
@@ -58,6 +57,8 @@ export interface ProfileCardContract {
          * @source LLM synthesis from writing style, interview transcripts
          */
         personalityTags: string[];
+        /** Optional URL pointing to the prospect's profile picture */
+        avatarUrl?: string | null;
     };
 
     /** ── Back Face (Connect Panel) ── */
@@ -125,12 +126,6 @@ export interface IcpScoreContract {
         /** Positive or negative contribution to the total. */
         delta: number;
     }>;
-
-    /**
-     * 🟣 Timing signal score, 0–100. Measures urgency/recency of buy signals.
-     * @source Scoring engine
-     */
-    timingSignal: number;
 }
 
 
@@ -143,17 +138,23 @@ export interface IcpScoreContract {
  * All numeric values are RAW — React formats them for display.
  */
 export interface OrgFootprintContract {
-    /**
-     * 🔵 Current funding stage.
-     * @source Crunchbase / PitchBook
-     */
-    growthStage: GrowthStage | null;
+    /** 🟣 Total funding raised formatted. @example "$120M" */
+    fundingValue: string | null;
+
+    /** 🟣 Estimated number of subsidiaries/branches. @example "1,500+" */
+    organizations: string | null;
+
+    /** 🟣 Estimated number of active users. @example "10 M+" */
+    activeUsers: string | null;
+
+    /** 🟣 Most recent exit / acquisition value. @example "$1.7 B" */
+    recentExit: string | null;
 
     /**
-     * The 5 metric tiles are sourced from OrganizationContract (base.ts).
-     * This card reads from the global `organization` object — no duplication.
-     * The only profile-specific field is `growthStage` above.
+     * 🔵/🟣 Current growth/funding stage.
+     * @source Crunchbase / PitchBook / LLM Search
      */
+    growthStage: string | null;
 }
 
 
@@ -255,9 +256,12 @@ export interface KpiContract {
     overallTrend: TrendDirection | null;
 
     /**
-     * 🔵 Product launch count or summary. @source Press releases / CRM
+     * 🟣 Disclaimer for private company estimated financials.
+     * When present, the UI shows an info tooltip making the card "audit-proof".
+     * @example "Financial KPIs are estimates based on industry benchmarks..."
+     * @source LLM — auto-generated for private companies, null for public ones.
      */
-    productLaunches: string | null;
+    dataDisclaimer: string | null;
 }
 
 

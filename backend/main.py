@@ -1,3 +1,4 @@
+import logging
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime, timezone
@@ -5,11 +6,18 @@ import uuid
 
 # Import our new scalable prompt modules
 from features.shared.contracts import PromptContext, ResponseMeta
+from features.shared.llm_client import generate_json
 from features.prospect.profile import (
     PROFILE_SYSTEM_PROMPT,
     build_profile_prompt,
     ProfilePromptResponse
 )
+
+# Demo seller context — simulates a logged-in user
+# When auth is added, replace with DB lookup after login
+from config.demo_seller import DEMO_SELLER
+
+logger = logging.getLogger("main")
 
 app = FastAPI(title="Prospect Intelligence Orchestrator")
 
@@ -21,6 +29,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/")
+def read_root():
+    return {
+        "name": "Prospect Intelligence Orchestrator",
+        "version": "1.0.0",
+        "status": "online",
+        "documentation": "/docs",
+        "health": "/health"
+    }
+
 @app.get("/health")
 def health_check():
     return {"status": "ok", "message": "Orchestrator is running"}
@@ -30,106 +48,55 @@ def generate_profile(req: PromptContext):
     """
     Handles the Profile Tab generation. Uses the deterministic Identity and 
     Organization data from the frontend to synthesize generative insights.
+    
+    Flow:
+      1. Inject seller context
+      2. Build system + user prompts
+      3. Call Gemini → get raw JSON
+      4. Validate with Pydantic
+      5. Return to frontend
     """
     
-    # 1. Build the prompt using the context we received from the frontend
+    # 0. Inject demo seller context (future: load from auth/DB)
+    req.seller = DEMO_SELLER
+    
+    # 1. Build the prompts
     user_prompt = build_profile_prompt(req)
     system_prompt = PROFILE_SYSTEM_PROMPT
     
-    # 2. Call the LLM (Mocked for now)
-    # TODO: Replace with openai.chat.completions.create(model="gpt-4o", messages=[...])
-    
-    mock_llm_json = {
-        "profileCard": {
-            "persona": {
-                "functionalOwnership": "Direct Sales, RevOps, and Partner Channels",
-                "personalityTags": ["Process-Oriented", "Direct", "Scaling-Expert"]
-            },
-            "mentions": {
-                "digitalFootprint": "Recently spoke on the 'SaaS Masters' podcast about scaling.",
-                "latestMentions": [
-                    {
-                        "type": "podcast",
-                        "title": "SaaS Masters Interview",
-                        "summary": "Discussed transition from founder-led sales to predictable revenue engines.",
-                        "url": "https://example.com/podcast"
-                    }
-                ],
-                "recentNews": "CloudScale Analytics expands EMEA presence with new London office."
-            }
-        },
-        "icpScore": {
-            "score": 92,
-            "confidence": "High",
-            "breakdown": [
-                {"label": "Company Size & Stage", "delta": 30},
-                {"label": "Buyer Persona", "delta": 25}
-            ],
-            "timingSignal": 85
-        },
-        "orgFootprint": {
-            "growthStage": "Series C"
-        },
-        "companyHealth": {
-            "industry": "SaaS / AI",
-            "revenueRange": "$50M-$100M",
-            "geography": "San Francisco, CA",
-            "employees": 450,
-            "hiringVelocity": "Aggressive",
-            "marketShare": 0.12,
-            "fundingStatus": "Series C",
-            "industryContext": "High-growth sector facing legacy enterprise competition."
-        },
-        "kpis": {
-            "revenueHistory": [
-                {"year": 2023, "revenueGrowth": 45.2, "netProfitMargin": -12.0, "trend": "Up"},
-                {"year": 2024, "revenueGrowth": 56.5, "netProfitMargin": -8.5, "trend": "Up"}
-            ],
-            "overallTrend": "Up",
-            "productLaunches": "2 major launches in Q3"
-        },
-        "professionalJourney": {
-            "career": [
-                {
-                    "period": "2020 - Present",
-                    "role": "VP of Global Sales",
-                    "company": "CloudScale Analytics",
-                    "isCurrent": True
-                }
-            ],
-            "education": [
-                {
-                    "degree": "MBA",
-                    "school": "Stanford",
-                    "year": "Class of 2010"
-                }
-            ],
-            "careerNarrative": "Sarah has a proven track record of being brought into Series B/C data infrastructure companies to build out scalable enterprise motions."
-        },
-        "businessContext": {
-            "marketPressures": "Increased competition from legacy enterprise vendors.",
-            "digitalMaturity": "High - Fully integrated modern revops stack."
-        }
-    }
-    
+    # 2. Call the LLM
+    logger.info(f"[Profile] Sending prompt for: {req.identity.fullName if req.identity else 'Unknown'} at {req.identity.companyName if req.identity else 'Unknown'}")
+    logger.info(f"[Profile] User prompt preview:\n{user_prompt[:600]}")
+    try:
+        raw_json = generate_json(system_prompt, user_prompt)
+    except RuntimeError as e:
+        # API key not configured
+        raise HTTPException(status_code=503, detail=str(e))
+    except ValueError as e:
+        # LLM returned invalid JSON
+        logger.error(f"LLM JSON parse error: {e}")
+        raise HTTPException(status_code=502, detail=f"LLM returned invalid JSON: {e}")
+    except Exception as e:
+        logger.error(f"LLM call failed: {e}")
+        raise HTTPException(status_code=502, detail=f"LLM call failed: {e}")
+
     # 3. Validate the LLM output using Pydantic
     try:
-        # This is where the magic happens: validating the mock matches our contract exactly.
-        validated_response = ProfilePromptResponse.model_validate(mock_llm_json)
+        validated_response = ProfilePromptResponse.model_validate(raw_json)
     except Exception as e:
-        # If the LLM hallucinates wrong keys or enums, we catch it before sending to React.
-        raise HTTPException(status_code=500, detail=f"LLM Response failed validation: {str(e)}")
+        # LLM hallucinated wrong keys, enums, or structure
+        logger.error(f"Pydantic validation failed: {e}")
+        raise HTTPException(status_code=500, detail=f"LLM response failed schema validation: {e}")
 
     # 4. Attach Production Meta
     meta = ResponseMeta(
         generatedAt=datetime.now(timezone.utc).isoformat(),
-        modelVersion="mock-gpt-4o",
+        modelVersion="gemini-2.0-flash",
         traceId=str(uuid.uuid4()),
         cacheStatus="miss"
     )
 
-    # 5. Return the payload matching the root ProspectIntelligence interface
-    # React expects the root insights block to just have the tab name + _meta
+    # 5. Return the payload matching the ProspectIntelligence interface
     return {
         "_meta": meta.model_dump(),
         "profile": validated_response.model_dump()

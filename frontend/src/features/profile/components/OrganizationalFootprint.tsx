@@ -1,52 +1,100 @@
 import * as React from 'react';
 import { Card, CardHeader } from '@/shared/components/Card';
 import { MetricBox } from '@/shared/components/MetricBox';
-import type { DashboardData } from '@/types/dashboard';
+import { useProspecting } from '@/context/ProspectingContext';
 
 /**
- * Props for the OrganizationalFootprint component.
+ * Displays the prospect's organizational scale and status.
+ * Reads live data from the LLM response in the SSoT. No props needed.
  */
-interface OrganizationalFootprintProps {
-    /** The normalized dashboard data providing company profile details. */
-    data?: DashboardData;
-}
+export function OrganizationalFootprint() {
+    const { prospectingData } = useProspecting();
+    const orgFootprint = prospectingData.insights?.profile?.orgFootprint;
 
-/**
- * A top-level summary component displaying the prospect's organizational scale and status.
- * Renders a horizontal band of interactive metrics including funding, user count, and growth stage.
- * Features hover-reactive tiles for enhanced user engagement.
- * 
- * @param {OrganizationalFootprintProps} props - The component props.
- * @returns {JSX.Element} The rendered OrganizationalFootprint component.
- */
-export function OrganizationalFootprint({ data }: OrganizationalFootprintProps) {
-    const fundingStatus = data?.profile_fit?.company?.funding_status;
-    const stageLabel = fundingStatus ? `${fundingStatus}` : 'Series C';
+    const cards = [];
+
+    if (orgFootprint?.fundingValue && orgFootprint.fundingValue !== 'null' && orgFootprint.fundingValue !== '—') {
+        cards.push({
+            label: "Funding",
+            value: orgFootprint.fundingValue.split('|')[0]?.trim(),
+            subValue: orgFootprint.fundingValue.includes('|') ? orgFootprint.fundingValue.split('|')[1]?.trim() : undefined,
+            smallIcon: "payments"
+        });
+    }
+
+    if (orgFootprint?.organizations && orgFootprint.organizations !== 'null' && orgFootprint.organizations !== '—') {
+        cards.push({
+            label: "Organizations",
+            value: orgFootprint.organizations.split('|')[0]?.trim(),
+            subValue: orgFootprint.organizations.includes('|') ? orgFootprint.organizations.split('|')[1]?.trim() : undefined,
+            smallIcon: "corporate_fare"
+        });
+    }
+
+    if (orgFootprint?.activeUsers && orgFootprint.activeUsers !== 'null' && orgFootprint.activeUsers !== '—') {
+        cards.push({
+            label: "Active Users",
+            value: orgFootprint.activeUsers.split('|')[0]?.trim(),
+            subValue: orgFootprint.activeUsers.includes('|') ? orgFootprint.activeUsers.split('|')[1]?.trim() : undefined,
+            smallIcon: "groups"
+        });
+    }
+
+    if (orgFootprint?.recentExit && orgFootprint.recentExit !== 'null' && orgFootprint.recentExit !== '—') {
+        cards.push({
+            label: "Recent Exit",
+            value: orgFootprint.recentExit.split('|')[0]?.trim(),
+            subValue: orgFootprint.recentExit.includes('|') ? orgFootprint.recentExit.split('|')[1]?.trim() : undefined,
+            smallIcon: "moving"
+        });
+    }
+
+    if (orgFootprint?.growthStage && orgFootprint.growthStage !== 'null' && orgFootprint.growthStage !== '—') {
+        cards.push({
+            label: "Growth Stage",
+            value: orgFootprint.growthStage.split('|')[0]?.trim(),
+            subValue: orgFootprint.growthStage.includes('|') ? orgFootprint.growthStage.split('|')[1]?.trim() : undefined,
+            smallIcon: "trending_up"
+        });
+    }
+
+    const gridCols = cards.length === 1 ? 'md:grid-cols-1' :
+        cards.length === 2 ? 'md:grid-cols-2' :
+            cards.length === 3 ? 'md:grid-cols-3' :
+                cards.length === 4 ? 'md:grid-cols-4' :
+                    'md:grid-cols-5';
+
+    if (cards.length === 0) return null;
 
     return (
         <Card padding="sm" className="h-full flex flex-col justify-center">
             <CardHeader icon="business" title="Organizational Footprint" className="mb-2" />
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-3 flex-1 items-center mt-2 mb-2">
-                <MetricBoxHover label="Funding" value="$120M" smallIcon="payments" />
-                <MetricBoxHover label="Organizations" value="1,500+" smallIcon="corporate_fare" />
-                <MetricBoxHover label="Active Users" value="10 M+" smallIcon="groups" />
-                <MetricBoxHover label="Recent Exit" value="$1.7 B" smallIcon="moving" />
-                <MetricBoxHover label="Growth Stage" value={stageLabel} smallIcon="trending_up" className="col-span-2 md:col-span-1" />
+            <div className={`grid grid-cols-2 ${gridCols} gap-3 flex-1 items-center mt-2 mb-2`}>
+                {cards.map((c) => (
+                    <MetricBoxHover
+                        key={c.label}
+                        label={c.label}
+                        value={c.value!}
+                        subValue={c.subValue}
+                        smallIcon={c.smallIcon}
+                        valueClassName="text-[19px] whitespace-nowrap"
+                    />
+                ))}
             </div>
         </Card>
     );
 }
 
 /**
- * Enhanced wrapper for the MetricBox component that adds hover animations and shadow effects.
- * 
- * @param {React.ComponentProps<typeof MetricBox>} props - Standard MetricBox props.
- * @returns {JSX.Element} The rendered MetricBoxHover component.
+ * Enhanced wrapper for MetricBox with hover animations.
  */
 function MetricBoxHover(props: React.ComponentProps<typeof MetricBox>) {
     return (
         <div className="group/tile transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md rounded-2xl">
-            <MetricBox {...props} className={`transition-colors duration-200 group-hover/tile:bg-slate-100/80 group-hover/tile:border-slate-200 ${props.className ?? ''}`} />
+            <MetricBox
+                {...props}
+                className={`transition-colors duration-200 group-hover/tile:bg-slate-100/80 group-hover/tile:border-slate-200 ${props.className ?? ''}`}
+            />
         </div>
     );
 }
