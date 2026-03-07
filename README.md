@@ -1,115 +1,89 @@
-# Prospect Dashboard
+# Prospect Intelligence Dashboard 🚀
 
-A **sales intelligence dashboard** that transforms raw prospect data into actionable insights across multiple analysis stages. Built for sales reps who need to quickly assess prospect fit, authority, budget, pain points, and deal velocity — all in one place.
+A high-performance **Sales Intelligence Dashboard** designed to transform raw prospect data into actionable insights. Built for modern sales teams to assess **ICP Fit, Authority, Pain Points, and Deal Velocity** through an intuitive, stage-based workflow.
 
 ---
 
-## 🚀 Quick Start
+## 🎨 Features
 
-```bash
-# Install dependencies
-npm install
-
-# Run development server
-npm run dev
-
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
-```
+- **Stage-Based Navigation**: Systematic analysis from initial profile to deal closing.
+- **BANT Analysis Workspace**: Dedicated modules for Budget, Authority, Need, and Timeline.
+- **Dynamic Visualizations**: Real-time charts for revenue growth and performance trends.
+- **Fluid UI/UX**: Ultra-smooth transitions powered by GSAP and Framer Motion.
+- **Component-First Architecture**: Modular grid-based layouts using shared UI primitives.
 
 ---
 
 ## 🛠 Tech Stack
 
-| Layer          | Technology                                              |
-| -------------- | ------------------------------------------------------- |
-| **Framework**  | React 19 + TypeScript                                   |
-| **Bundler**    | Vite 7                                                  |
-| **Styling**    | Tailwind CSS 3.4 + custom CSS                           |
-| **Charts**     | Recharts 3.7                                            |
-| **Animations** | Framer Motion 12 · GSAP 3.14                            |
-| **UI Primitives** | Radix UI (Avatar, Dialog, Tabs, Tooltip, Dropdown…)  |
-| **Icons**      | Material Symbols Outlined · Lucide React                |
-| **Fonts**      | Inter (Google Fonts)                                    |
-| **Forms**      | React Hook Form + Zod validation                        |
-| **Utilities**  | clsx · tailwind-merge · class-variance-authority (CVA)  |
+| Layer | Technology |
+| :--- | :--- |
+| **Framework** | React 19 + TypeScript |
+| **Bundler** | Vite 7 |
+| **Styling** | Tailwind CSS 3.4 |
+| **Charts** | Recharts 3.7 |
+| **Animations** | Framer Motion 12 · GSAP 3.14 |
+| **UI Primitives** | Radix UI (Avatar, Dialog, Tooltip, Dropdown) |
+| **Icons** | Material Symbols Outlined · Lucide React |
 
 ---
 
-## 📐 Architecture Overview
+## 🚀 Quick Start
 
-The dashboard follows a **stage-based navigation** model:
+Ensure you have [Node.js](https://nodejs.org/) installed, then run:
 
-```
-┌─────────────────────────────────────────────────────────┐
-│  Navbar  (pill-based section switching)                  │
-├─────────────────────────────────────────────────────────┤
-│  Folder Tabs  (sub-tabs within a section)               │
-├─────────────────────────────────────────────────────────┤
-│                                                         │
-│   ┌──────────────────────────────────────────────┐      │
-│   │  PageHeader  (breadcrumb + title)            │      │
-│   ├──────────────────────────────────────────────┤      │
-│   │                                              │      │
-│   │  Stage View                                  │      │
-│   │  (bento grid of cards)                       │      │
-│   │                                              │      │
-│   └──────────────────────────────────────────────┘      │
-│                                                         │
-└─────────────────────────────────────────────────────────┘
+```bash
+# 1. Install dependencies
+npm install
+
+# 2. Start development server
+npm run dev
+
+# 3. Build for production
+npm run build
 ```
 
-### Navigation Sections
+---
 
-| Section         | Tabs                               | Purpose                                   |
-| --------------- | ---------------------------------- | ----------------------------------------- |
-| **Home**        | —                                  | Landing / overview                        |
-| **Prospect**    | Profile · Power · Pain · Path      | Deep-dive into the prospect entity        |
-| **Qualification** | Budget · Authority · Need · Timeline | BANT analysis framework               |
-| **Need**        | —                                  | Need analysis (placeholder)               |
-| **Proposition** | Timeline                           | Value proposition & timeline              |
+## 📐 Architecture
 
-### Core Patterns
+The dashboard implements a **Stage → Tab → Card** hierarchy:
 
-1. **Orchestrator →  Cards**: Each tab renders a `Stage*` component that acts as a pure layout grid, importing and arranging smaller card components.
-2. **Shared UI Primitives**: Repeated patterns (`MetricBox`, `StatusTag`, `InfoRow`, etc.) live in `components/ui/` and are imported everywhere.
-3. **Props-down data flow**: `App.tsx` normalizes JSON → passes typed data to stage orchestrators → sub-cards. No global state.
-4. **< 100 lines per file**: Every component stays small and focused.
+1. **Top Navbar**: Primary section switching (Home, Prospect, Qualification, etc.).
+2. **Folder Tabs**: Contextual sub-navigation within a specific analysis stage.
+3. **Bento Grid Layout**: Each tab renders a responsive grid of specialized intelligence cards.
+
+### Navigation Map
+
+| Section | Analysis Modules | Purpose |
+| :--- | :--- | :--- |
+| **Home** | Overview | Pipeline health and recent alerts. |
+| **Prospect** | Profile · Power · Pain · Path | Entity deep-dive and stakeholder mapping. |
+| **Qualification** | Budget · Authority · Need · Timeline | Detailed BANT framework assessment. |
+| **Proposition** | Portfolio · Timeline | Value mapping and closing strategy. |
 
 ---
 
 ## 📂 Project Structure
 
-See [FOLDER.md](./FOLDER.md) for a detailed breakdown of every directory and file.
+- `src/components/layout`: Global navigation and header components.
+- `src/components/stages`: Orchestrator components for each major dashboard view.
+- `src/components/ui`: Shared, reusable atomic design components (MetricBox, StatusTag).
+- `src/lib`: Logic for data normalization and scoring heuristics.
+- `src/types`: Centralized TypeScript definitions for data contracts.
 
 ---
 
-## 🎨 Design System
+## 📄 Documentation
 
-See [COLORS_UX.md](./COLORS_UX.md) for the full color palette, typography, spacing tokens, and component styling reference.
-
----
-
-## 📏 Code Rules
-
-See [RULES.md](./RULES.md) for the instructions and conventions followed when generating code for this project.
+| Doc | Description |
+| :--- | :--- |
+| [ARCHITECTURE.md](./docs/DASHBOARD_ARCHITECTURE.md) | Technical deep-dive into the render logic. |
+| [COLORS_UX.md](./docs/COLORS_UX.md) | Design system tokens and styling rules. |
+| [RULES.md](./docs/RULES.md) | Code quality and generation standards. |
 
 ---
 
-## 📄 Other Docs
+## 📜 License
 
-| File                                                   | Description                                    |
-| ------------------------------------------------------ | ---------------------------------------------- |
-| [DASHBOARD_ARCHITECTURE.md](./DASHBOARD_ARCHITECTURE.md) | High-level system design & quick-reference map |
-| [FOLDER.md](./FOLDER.md)                               | Full folder tree with reusability notes        |
-| [COLORS_UX.md](./COLORS_UX.md)                        | Colors, fonts, and styling tokens              |
-| [RULES.md](./RULES.md)                                | Code generation rules & conventions            |
-
----
-
-## License
-
-Private — internal use only.
+Private — Internal Development Only.
