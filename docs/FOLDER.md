@@ -1,100 +1,107 @@
-# Folder Structure & Code Reusability Guide
+# 📂 Project Structure & Module Guide
 
-> A complete map of the project directory structure, detailing the purpose of each module and how to leverage shared assets to maintain a clean, reusable codebase.
+This document provides a complete map of the **Prospect Radar** codebase, detailing the purpose of each directory and the role of key architectural modules.
 
 ---
 
-## 🏗️ Root Directory
+## 🏗️ High-Level Root
 
 ```text
 prospect-dashboard/
-├── frontend/                  # React Application (Vite + Tailwind)
+├── frontend/                  # React 19 Application (Vite + Tailwind)
 │   ├── src/                   # Main source code
-│   ├── docs/                  # Project documentation (Rules, Folder Map, etc.)
-│   └── ...                    # Configuration files (Vite, Tailwind, TS, ESLint)
-├── backend/                   # FastAPI Orchestrator (Python)
-│   ├── main.py                # Server entry point & AI routing
-│   └── requirements.txt       # Python dependencies
-├── prompts/                   # Repository of LLM system prompts (Plaintext)
-└── README.md                  # Project overview
+│   └── public/                # Static assets
+├── backend/                   # FastAPI Orchestrator (Python 3.10+)
+│   ├── main.py                # API Entry point & Route definitions
+│   ├── features/              # Feature-specific logic (Prompting, Analysis)
+│   └── requirements.txt       # Dependencies
+├── docs/                      # 📖 Project documentation (Rules, Design, Tree)
+├── prompts/                   # 🤖 Standardized LLM Prompt Repository
+└── README.md                  # Project overview & Setup guide
 ```
 
 ---
 
-## 🎨 `frontend/src/` — Application Layer
+## 🎨 `frontend/src/` — UI Layer
 
-The frontend is built with a **Feature-First** architecture, keeping business logic local to its domain while sharing generic UI atoms.
+The frontend follows a **Feature-First** architecture combined with a centralized **Contract System** for type-safety across the network.
 
 ```text
 src/
-├── App.tsx                    # Main entry point & state orchestrator
-├── main.tsx                   # React DOM hydration
+├── App.tsx                    # Top-level state & Navigation orchestrator
+├── main.tsx                   # React DOM Entry
 │
-├── config/                    # ⚙️ Global App Configuration
-│   └── navigation.ts          # SSoT for Sidebar and Tab structures
+├── contracts/                 # 🏷️ Data Contracts (Mirroring Backend Pydantic)
+│   ├── base.ts                # Shared types (Identity, Organization, Seller)
+│   ├── profile.ts             # Profile tab specific insights
+│   └── index.ts               # Global ProspectIntelligence export
 │
-├── features/                  # 🚀 Business Logic & Stages (Modular)
-│   ├── home/                  # Landing page
-│   ├── profile/               # Stage 1: Profile Fit
-│   ├── power/                 # Stage 2: Power & Stakeholders
+├── context/                   # 🧠 State Management
+│   └── ProspectingContext.tsx # The Single Source of Truth (SSoT)
+│
+├── features/                  # 🚀 Business Domains (Self-Contained)
+│   ├── home/                  # Landing & Stage Transition logic
+│   ├── profile/               # Stage 1: Profile Fit & Industry Insights
+│   ├── power/                 # Stage 2: Power & Stakeholder Analysis
 │   ├── needs-analysis/        # Stage 4: Pain & Urgency
-│   ├── qualification/         # BANT Deep Dives
-│   ├── velocity/              # Stage 5: Deal Path
-│   └── shared/                # Feature-specific shared components (e.g. PlaceholderView)
+│   └── velocity/              # Stage 5: Deal Path & Ecosystem Fit
 │
 ├── components/                # 🧱 Global UI Shell
-│   └── layout/                # DashboardLayout.tsx (The App Frame)
+│   ├── layout/                # DashboardLayout.tsx & PageHeader.tsx
+│   └── ui/                    # Reusable "Atoms" (MetricBox, InfoRow, etc.)
 │
-├── shared/                    # 🧬 Atomic Design Components
-│   ├── components/            # Card, MetricBox, StatusTag, InfoRow, etc.
-│   └── layout/                # Navbar, PageHeader, ProfileDropdown
+├── hooks/                     # ⚓ Functional Logic
+│   └── usePromptController.ts # Lazy-loader for LLM API tabs
 │
-├── types/                     # 🏷️ TypeScript Definitions
-│   └── dashboard.ts           # The Master Data Contract
+├── lib/                       # 🛠️ Core Utilities
+│   ├── theme.ts               # Centralized Design System Tokens
+│   └── normalizer.ts          # External data transformation logic
 │
-├── lib/                       # 🛠️ Utilities & Domain Core
-│   ├── normalizer.ts          # Transforms raw JSON to DashboardData
-│   ├── theme.ts               # Semantic color mapping logic
-│   └── domain/                # Pure business logic (Scoring, Evaluations)
-│
-├── hooks/                     # ⚓ Global React Hooks (usePromptController)
-└── data/                      # 💾 Mock Data & Static Stores
+└── data/                      # 💾 Static data & Initial states
 ```
 
 ---
 
-## 🧬 Component Reusability Map
+## 🐍 `backend/` — Intelligence Layer
 
-### 1. `shared/components/` (Design System Atoms)
-These are raw, generic building blocks. **Do not put business logic here.**
+The backend uses a modular **Feature-based Routing** system to ensure the AI logic stays organized as tabs are added.
 
-| Component | Purpose | Pros/Usage |
-| :--- | :--- | :--- |
-| `Card` | Base container for all widgets | Consistent padding and shadow-0 |
-| `MetricBox` | Display a label, value, and trend | Perfect for KPIs and financial stats |
-| `StatusTag` | Colored pills (High/Med/Low) | Confidence signals and risk levels |
-| `InfoRow` | Icon + Title + Value list row | Stakeholder lists, company stats |
-| `ScoreDisplay` | Large circular/numeric score | ICP Score, Authority strength |
-
-### 2. `shared/layout/` (Persistent UI)
-Components that appear on every screen of the dashboard.
-
-*   **`Navbar.tsx`**: Driven by `config/navigation.ts`. Self-adjusting pill nav.
-*   **`PageHeader.tsx`**: Dynamic breadcrumbs and titles.
-*   **`ProfileDropdown.tsx`**: User meta-controls.
-
-### 3. `components/layout/` (Structural Framework)
-*   **`DashboardLayout.tsx`**: The main "Stage" orchestrator. Encapsulates the sidebar, top header, and the content "glass" pane.
+```text
+backend/
+├── main.py                    # Root FastAPI app & Middleware
+├── .env                       # Secrets (API Keys)
+│
+├── features/                  # 🧠 Intelligence Modules
+│   ├── prospect/              # Main Analysis routing
+│   │   ├── profile.py         # Profile Prompt Engineering & Models
+│   │   └── ...                # Other tab-specific services
+│   └── shared/                # Cross-cutting concerns
+│       ├── contracts.py       # Pydantic models (SSoT for Data)
+│       └── llm_client.py      # LLM Provider wrapper
+│
+├── config/                    # ⚙️ App Settings
+│   └── demo_seller.py         # Static demo environment config
+└── venv/                      # Python Virtual Environment
+```
 
 ---
 
-## 🚀 How to Add a New Feature
+## 🧬 Architectural Patterns
 
-1.  **Define Types**: Update `types/dashboard.ts` if the data contract changed.
-2.  **Add Config**: Update `config/navigation.ts` to add the section/tab to the sidebar.
-3.  **Feature Folder**: Create `src/features/{feature-name}/`.
-    *   `index.ts`: Export the main Stage component.
-    *   `{Name}Stage.tsx`: The orchestrator (Grid layout).
-    *   `components/`: Local sub-components.
-4.  **Register Stage**: Add the component to the `renderStageView` registry in `App.tsx`.
-5.  **Normalize**: Update `lib/normalizer.ts` to map raw JSON fields to the new feature.
+### 1. The Contract System
+We maintain **Mirrored Models** between `backend/features/shared/contracts.py` (Pydantic) and `frontend/src/contracts/*.ts` (TypeScript). This ensures that the LLM's JSON output perfectly maps to the UI's interface with zero runtime transformation errors.
+
+### 2. Feature Orchestration
+Each folder in `src/features/` is a mini-app. It contains its own grid layout (the Orchestrator) and a `components/` sub-folder for its specific cards.
+
+### 3. SSoT Context
+The `ProspectingContext` is the only source of data for the UI. It provides typed objects that components consume via the `useProspecting()` hook, replacing the old pattern of passing props through 5 levels.
+
+---
+
+## 🚀 How to Add a New Tab
+
+1.  **Define Contract**: Add the new interface to `frontend/src/contracts/` and its matching Pydantic model to the backend.
+2.  **Backend Route**: Create a new service in `backend/features/` to handle the prompt logic.
+3.  **Frontend Feature**: Create `src/features/{tab-name}/` with an Orchestrator and local components.
+4.  **Registration**: Register the new tab in the `App.tsx` navigation config.

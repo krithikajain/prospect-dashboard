@@ -1,144 +1,82 @@
 # Dashboard Architecture — High-Level System Design
 
-> This document describes the overall architecture, data flow, and design principles of the Prospect Dashboard.
+> This document describes the overall architecture, data flow, and design principles of the **Prospect Radar**.
 
 ---
 
 ## System Overview
 
-```
-                         ┌──────────────────────────┐
-                         │    Raw JSON Data          │
-                         │ (studio_results_*.json)   │
-                         └──────────┬───────────────┘
-                                    │
-                                    ▼
-                         ┌──────────────────────────┐
-                         │    normalizer.ts          │
-                         │  JSON → Typed TS Objects  │
-                         └──────────┬───────────────┘
-                                    │
-                                    ▼
-                         ┌──────────────────────────┐
-                         │       App.tsx             │
-                         │ (root layout + routing)   │
-                         └──────────┬───────────────┘
-                                    │
-              ┌─────────────────────┼──────────────────────┐
-              ▼                     ▼                      ▼
-   ┌──────────────────┐  ┌──────────────────┐   ┌──────────────────┐
-   │  Layout Shell    │  │  Stage Orch.     │   │  Shared UI       │
-   │  (Navbar, Header,│  │  (Stage1Profile, │   │  (MetricBox,     │
-   │   ProfileDrop.)  │  │   Stage2Stake…)  │   │   StatusTag…)    │
-   └──────────────────┘  └────────┬─────────┘   └──────────────────┘
-                                  │
-                     ┌────────────┼────────────┐
-                     ▼            ▼            ▼
-              ┌───────────┐ ┌──────────┐ ┌──────────┐
-              │ CardA.tsx │ │ CardB.tsx│ │ CardC.tsx│
-              └───────────┘ └──────────┘ └──────────┘
+The application follows a decoupled **Client-Server Orchestrator** pattern.
+
+```mermaid
+graph TD
+    subgraph "Frontend (React 19 + Vite)"
+        A[DashboardLayout] --> B[Feature Orchestrator]
+        B --> C[Sub-Card Component]
+        D[ProspectingContext] -.->|"Provides Typed Data"| B
+        E[usePromptController] -->|"Fetches Insights"| F[Backend API]
+    end
+
+    subgraph "Backend (FastAPI)"
+        F --> G[Feature Service]
+        G --> H[Prompt Constants]
+        G --> I[LLM / Gemini AI]
+        J[Pydantic Models] -.->|"Validates Output"| G
+    end
+
+    I -- "Raw JSON" --> G
+    G -- "Validated Typed JSON" --> F
+    F -- "ProspectIntelligence Contract" --> E
 ```
 
 ---
 
-## Data Layer
+## Data Layer & Contracts
 
-### Source
+### 🏷️ The Contract System (SSoT)
+We maintain strictly mirrored models between the Backend (Pydantic) and the Frontend (TypeScript). This ensures end-to-end type safety and allows the LLM to output data that exactly matches the UI's expectations.
 
-Raw prospect intelligence data lives in `src/data/studio_results_20260212_1512.json` (~107 KB). This is the single source of truth for all dashboard content.
+| File (Frontend) | Responsibility |
+| :--- | :--- |
+| `src/contracts/base.ts` | Shared types (Identity, Organization, Seller Context). |
+| `src/contracts/profile.ts` | Profile-tab specific metrics and news insights. |
+| `src/contracts/index.ts` | The composed `ProspectIntelligence` root type. |
 
-### Normalization Pipeline
-
-| File                  | Role                                                         |
-| --------------------- | ------------------------------------------------------------ |
-| `src/lib/normalizer.ts` | Transforms raw JSON into strongly-typed TypeScript objects. Contains ~20KB of field mappings, fallback logic, and safe-access patterns. |
-| `src/types/dashboard.ts` | TypeScript interfaces for the normalized data shape.       |
-| `src/data/prospectData.ts` | Re-exports the current prospect as a convenient import.   |
-| `src/data/budgetData.ts` | Supplementary budget/financial data structures.            |
-
-### Scoring
-
-| File                                         | Role                                              |
-| -------------------------------------------- | ------------------------------------------------- |
-| `src/components/stages/profile/profileScoring.ts` | Calculates ICP Fit Score and Strategic Timing Signal from normalized data. |
-| `src/components/stages/velocity/velocityScoring.ts` | Calculates velocity/deal-readiness metrics.     |
+### 🛠️ Backend Intelligence
+| Module | Role |
+| :--- | :--- |
+| `backend/main.py` | API Entry point & middleware. |
+| `backend/features/` | Per-tab logic (Prompts, Services, Sub-contracts). |
+| `backend/features/shared/contracts.py` | Pydantic definitions for all contracts. |
 
 ---
 
-## Rendering Layer
+## Rendering Layer (Frontend)
 
-### App Shell (`App.tsx`)
+### 1. Feature Orchestrators (`src/features/`)
+Each stage of the dashboard (Profile, Power, Pain, Path) lives in its own feature directory. The top-level component (e.g., `ProfileStage.tsx`) is a **pure layout orchestrator** — it only arranges cards into grids and passes them typed data from the context.
 
-- Declares `NAV_CONFIG` — a static array defining every navigation section and its tabs.
-- Renders `<Navbar>`, `<ProfileDropdown>`, and the active `<StageView>`.
-- Folder-tab UI is rendered inline based on the current section's tab config.
-- Routes to the correct Stage orchestrator based on `activeSection` + `activeTab` state.
+### 2. Global Context (`src/context/`)
+The `ProspectingContext.tsx` handles the "Single Source of Truth". It stores the enriched `identity` and `organization` data, as well as the lazy-loaded `insights` for each tab.
 
-### Layout Components (`src/components/layout/`)
-
-| Component             | Responsibility                                          |
-| --------------------- | ------------------------------------------------------- |
-| `Navbar.tsx`          | Top-level pill navigation across sections               |
-| `PageHeader.tsx`      | Breadcrumb trail + page title inside the content card   |
-| `ProfileDropdown.tsx` | User avatar + dropdown menu (top-right)                 |
-
-### Stage Orchestrators (`src/components/stages/`)
-
-Each stage file is a **pure layout grid** — no business logic, no complex markup. It imports sub-card components and arranges them via CSS Grid / Flexbox.
-
-| Orchestrator           | Section        | Tab        | Cards it renders                                                                    |
-| ---------------------- | -------------- | ---------- | ----------------------------------------------------------------------------------- |
-| `Stage0Home.tsx`       | Home           | —          | (self-contained landing page)                                                       |
-| `Stage1Profile.tsx`    | Prospect       | Profile    | ProfileCard, IcpScoreCard, OrganizationalFootprint, CompanyHealth, BusinessContext, ProfessionalJourney |
-| `Stage2Stakeholder.tsx`| Prospect       | Power      | PowerMetrics, AuthorityPath, BudgetLogic, StakeholdersInvolved, BuyingHistory       |
-| `Stage4Need.tsx`       | Prospect       | Pain       | ProblemClarity, ImpactSeverity, NeedUrgencyDrivers, InternalFriction, PoliticalWeight |
-| `Stage5Path.tsx`       | Prospect       | Path       | VelocityMetrics, IntentSignals, CompetitiveFriction, EcosystemFit, AccessStrategy   |
-| `Stage6Timeline.tsx`   | Proposition    | Timeline   | (timeline visualization)                                                            |
-| `BudgetAssessment.tsx` | Qualification  | Budget     | SpendCapacity, FundingSources, DirectSignals, BehavioralSignals, ProcurementHistory, BudgetTrends, BudgetSynthesis |
-| `AuthorityDeepDive.tsx`| Qualification  | Authority  | (authority analysis — self-contained)                                               |
-
-### Shared UI Primitives (`src/components/ui/`)
-
-These are **design-system building blocks** imported by every card:
-
-| Component          | Pattern it replaces                                |
-| ------------------ | -------------------------------------------------- |
-| `Card` / `CardHeader` | Every card wrapper with consistent border-radius, shadow, padding |
-| `MetricBox`        | All stat tiles (Funding, Revenue, Active Users…)   |
-| `StatusTag`        | All colored pill badges (High / Medium / Low)      |
-| `InfoRow`          | Icon + label + description rows                    |
-| `ChecklistItem`    | Check / uncheck urgency items                      |
-| `ScoreDisplay`     | Large score numerics (ICP, Influence, etc.)         |
+### 3. Prompt Controller (`src/hooks/`)
+The `usePromptController` hook manages the asynchronous state of AI requests. It ensures that clicking a tab triggers the corresponding LLM call only if the data isn't already present in the SSoT.
 
 ---
 
 ## Architecture Principles
 
-1. **Orchestrator pattern** — Stage files are pure layout grids. No logic beyond grid placement.
-2. **One card = one file** — Every visual card has its own `.tsx` file. File names match what the user sees.
-3. **Shared primitives** — Repeated UI patterns live in `components/ui/` and are imported wherever needed.
-4. **Props down, no global state** — Data flows `App.tsx → Stage → Card` via props. No context providers or state management libraries.
-5. **< 100 lines per file** — If a file exceeds ~100 lines, it should be split further.
-6. **Glassmorphism surfaces** — Cards use the `.glass-card` class (frosted glass with backdrop blur).
-7. **Folder-tab metaphor** — Tabs connect visually to the content card below, creating a "file folder" metaphor with inverted corner radii.
+1. **Modular Contracts** — One file per tab. Small, focused, and globally composed.
+2. **One Card = One File** — Every visual card has its own `.tsx` file in the feature's `components/` folder.
+3. **Mirrored Models** — Backend Pydantic classes and Frontend TS interfaces must stay in sync.
+4. **Lazy-Loading Insights** — We only ask the AI for the analysis the user is currently viewing.
+5. **No Dead Code** — If it's not on screen, it shouldn't be in the repo.
 
 ---
 
 ## Quick Reference: Where to Find Things
 
-### To change navigation or app shell
-→ `src/components/layout/` — `Navbar.tsx`, `PageHeader.tsx`, `ProfileDropdown.tsx`
-
-### To change a specific card on a page
-→ `src/components/stages/{stage-folder}/{CardName}.tsx`
-
-### To change a shared UI pattern (tag, metric box, etc.)
-→ `src/components/ui/`
-
-### To change business logic (scoring, data normalization)
-→ `src/lib/normalizer.ts` — JSON → typed data  
-→ `src/components/stages/profile/profileScoring.ts` — ICP / timing score  
-→ `src/components/stages/velocity/velocityScoring.ts` — velocity metrics
-
-### To change types
-→ `src/types/dashboard.ts`
+*   **To change a UI card on a page**: → `src/features/{feature-name}/components/{CardName}.tsx`
+*   **To change the AI's instruction**: → `backend/features/{feature-name}/` or the `/prompts/` repository.
+*   **To update a data interface**: → `frontend/src/contracts/` AND `backend/features/shared/contracts.py`.
+*   **To adjust global colors/spacing**: → `src/lib/theme.ts` AND `tailwind.config.js`.
