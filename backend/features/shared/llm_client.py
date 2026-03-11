@@ -12,6 +12,7 @@ import os
 import json
 import logging
 from typing import Optional
+from pathlib import Path
 from dotenv import load_dotenv
 from google import genai
 
@@ -42,7 +43,25 @@ def _get_client() -> genai.Client:
 # ─── Public API ───────────────────────────────────────────────────────────────
 
 DEFAULT_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
-FALLBACK_MODELS = ["gemini-2.0-flash", "gemini-2.0-flash-lite"]
+FALLBACK_MODELS = ["gemini-2.0-flash"]
+
+def load_prompt(prompt_name: str) -> str:
+    """
+    Loads a prompt file from the root /prompts directory.
+    prompt_name: Name of the file with or without .txt extension.
+    """
+    if not prompt_name.endswith(".txt"):
+        prompt_name += ".txt"
+        
+    # backend/features/shared/llm_client.py -> backend root -> project root -> prompts/
+    base_dir = Path(__file__).resolve().parent.parent.parent.parent
+    prompt_path = base_dir / "prompts" / prompt_name
+    
+    if not prompt_path.exists():
+        logger.error(f"Prompt file not found: {prompt_path}")
+        raise FileNotFoundError(f"Missing prompt file: {prompt_name}")
+        
+    return prompt_path.read_text(encoding="utf-8")
 
 def generate_json(
     system_prompt: str,

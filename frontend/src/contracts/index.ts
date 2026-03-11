@@ -1,4 +1,4 @@
-import type { ResponseMeta, IdentityContract, OrganizationContract } from './base';
+import type { ResponseMeta, IdentityContract, OrganizationContract, SellerContract } from './base';
 import type { ProfileContract } from './profile';
 import type { PainContract } from './pain';
 import type { PowerContract } from './power';
@@ -6,7 +6,7 @@ import type { PathContract } from './path';
 
 // ─── Re-exports ──────────────────────────────────────────────────────────────
 
-export type { ResponseMeta, IdentityContract, OrganizationContract } from './base';
+export type { ResponseMeta, IdentityContract, OrganizationContract, SellerContract } from './base';
 export type {
     ConfidenceLevel,
     TrendDirection,
@@ -51,6 +51,9 @@ export interface ProspectIntelligence {
 
     /** Company-level scale metrics (the organization). */
     organization: OrganizationContract | null;
+
+    /** Seller Context: Info about who is doing the prospecting */
+    seller: SellerContract | null;
 
     /** Tab-specific insight payloads, lazy-loaded per tab. */
     insights: {

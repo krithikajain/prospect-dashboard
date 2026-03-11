@@ -26,6 +26,7 @@ export const DashboardContainer: React.FC<DashboardContainerProps> = ({ children
     const [prospectingData, setProspectingData] = useState<ProspectIntelligence>({
         identity: initialData?.identity || null,
         organization: initialData?.organization || null,
+        seller: initialData?.seller || null,
         insights: initialData?.insights || null,
     });
 

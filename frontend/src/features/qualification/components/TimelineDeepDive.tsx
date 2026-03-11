@@ -1,9 +1,8 @@
-import type { DashboardData } from '@/types/dashboard';
 import { evaluateTimeline } from '@/lib/domain/timelineEvaluation';
-import { CompellingEventsStrip } from '@/features/velocity/components/CompellingEventsStrip';
-import { BuyingPhaseAndVelocity } from '@/features/velocity/components/BuyingPhaseAndVelocity';
-import { ImplementationReadiness } from '@/features/velocity/components/ImplementationReadiness';
-import { ProcurementArchitecture } from '@/features/velocity/components/ProcurementArchitecture';
+import { CompellingEventsStrip } from '@/features/prospect/path/components/CompellingEventsStrip';
+import { BuyingPhaseAndVelocity } from '@/features/prospect/path/components/BuyingPhaseAndVelocity';
+import { ImplementationReadiness } from '@/features/prospect/path/components/ImplementationReadiness';
+import { ProcurementArchitecture } from '@/features/prospect/path/components/ProcurementArchitecture';
 /**
  * Timeline Deep Dive — BANT Qualification (T).
  * Executive Grade Refinement: 
@@ -11,7 +10,7 @@ import { ProcurementArchitecture } from '@/features/velocity/components/Procurem
  * - Separated Buying Phase & Velocity
  * - Readiness Heat Grid
  */
-export function TimelineDeepDive({ data }: { data: DashboardData }) {
+export function TimelineDeepDive({ data }: { data: any }) {
     const evaluation = evaluateTimeline(data);
 
     return (

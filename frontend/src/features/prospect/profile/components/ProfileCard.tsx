@@ -25,6 +25,8 @@ interface ProfileCardProps {
     digitalFootprint?: string | null;
     /** Summary of recent news involving the prospect. */
     recentNews?: string | null;
+    /** LinkedIn URL for the prospect */
+    linkedInUrl?: string | null;
     /** LLM-generated latest mentions array. */
     latestMentions?: Array<{ type: string; title: string; summary: string; url?: string | null }> | null;
 }
@@ -39,12 +41,12 @@ interface ProfileCardProps {
  */
 export function ProfileCard({
     name, company, role, imageUrl, functionalOwnership,
-    personalityTags, email, website, digitalFootprint, recentNews, latestMentions,
+    personalityTags, email, website, linkedInUrl, digitalFootprint, recentNews, latestMentions,
 }: ProfileCardProps) {
     const [isFlipped, setIsFlipped] = useState(false);
 
-    // Default placeholder images matching original display aesthetic
-    const defaultFrontImage = "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8Y2VvfGVufDB8fDB8fHww";
+    // Default placeholder images
+    const defaultFrontImage = ""; // No stock photo fallback; use gradient
     const defaultBackImage = "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=800&q=80";
 
     return (
@@ -63,12 +65,12 @@ export function ProfileCard({
                     isFlipped={isFlipped}
                 />
 
-                {/* BACK */}
                 <BackFace
                     name={name}
                     company={company}
                     email={email}
                     website={website}
+                    linkedInUrl={linkedInUrl}
                     defaultImageUrl={defaultBackImage}
                     digitalFootprint={digitalFootprint}
                     recentNews={recentNews}
@@ -112,14 +114,17 @@ function FrontFace({ name, company, role, imageUrl, defaultImageUrl, functionalO
     return (
         <div className={`absolute inset-0 backface-hidden w-full h-full flex flex-col justify-end transition-opacity duration-300 ${isFlipped ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-auto'}`}>
             {displayImage ? (
-                <img
-                    alt={name}
-                    className="absolute inset-0 w-full h-full object-cover object-top"
-                    src={displayImage}
-                    onError={() => setImgError(true)}
-                />
+                <>
+                    <div className="absolute inset-0 w-full h-full bg-slate-900" />
+                    <img
+                        alt={name}
+                        className="absolute inset-0 w-full h-[90%] object-contain object-top"
+                        src={displayImage}
+                        onError={() => setImgError(true)}
+                    />
+                </>
             ) : (
-                <div className="absolute inset-0 w-full h-full bg-[#0a0a0a]" />
+                <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-slate-800 to-slate-900" />
             )}
             <div className="absolute inset-x-0 bottom-0 h-full bg-gradient-to-t from-[#161616] via-[#161616]/40 to-transparent" />
             <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-[#161616] to-transparent" />
@@ -133,7 +138,9 @@ function FrontFace({ name, company, role, imageUrl, defaultImageUrl, functionalO
 
                 <div className="mt-auto mb-6 space-y-3 font-light text-[14px]">
                     <div>
-                        <p className="font-semibold text-white text-[16px]">{role} at {company}</p>
+                        <p className="font-semibold text-white text-[16px]">
+                            {role.split(' // ')[0].split(' | ')[0].split(', ')[0].trim()}
+                        </p>
                         <p className="text-gray-300 text-[14px] mt-0.5">{company}</p>
                     </div>
                     <p className="text-gray-300 leading-relaxed max-w-[95%] border-t border-white/10 pt-3">
@@ -168,6 +175,7 @@ interface BackFaceProps {
     company: string;
     email?: string | null;
     website?: string | null;
+    linkedInUrl?: string | null;
     defaultImageUrl: string;
     digitalFootprint?: string | null;
     recentNews?: string | null;
@@ -183,7 +191,7 @@ interface BackFaceProps {
  * @param {BackFaceProps} props - The component props.
  * @returns {JSX.Element} The rendered BackFace component.
  */
-function BackFace({ name, company, email, website, defaultImageUrl, digitalFootprint, recentNews, latestMentions, onFlip, isFlipped }: BackFaceProps) {
+function BackFace({ name, company, email, website, linkedInUrl, defaultImageUrl, digitalFootprint, recentNews, latestMentions, onFlip, isFlipped }: BackFaceProps) {
     // Map mention type → icon name + color
     const mentionIcon = (type: string) => {
         switch (type) {
@@ -192,6 +200,7 @@ function BackFace({ name, company, email, website, defaultImageUrl, digitalFootp
             case 'article': return { icon: 'article', color: 'text-blue-400' };
             case 'webinar': return { icon: 'record_voice_over', color: 'text-purple-400' };
             case 'social': return { icon: 'share', color: 'text-green-400' };
+            case 'blog': return { icon: 'rss_feed', color: 'text-yellow-400' };
             default: return { icon: 'article', color: 'text-blue-400' };
         }
     };
@@ -213,7 +222,7 @@ function BackFace({ name, company, email, website, defaultImageUrl, digitalFootp
 
                 {/* Social Icons */}
                 <div className="flex items-center gap-3 mb-5">
-                    <SocialIcon href={`https://linkedin.com/in/${name.replace(/\s+/g, '').toLowerCase()}`} bg="bg-[#0A66C2]">
+                    <SocialIcon href={linkedInUrl || `https://linkedin.com/in/${name.replace(/\s+/g, '').toLowerCase()}`} bg="bg-[#0A66C2]">
                         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path fillRule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" clipRule="evenodd" /></svg>
                     </SocialIcon>
                     <SocialIcon href={`mailto:${email || 'contact@acmecorp.com'}`}>
@@ -237,6 +246,7 @@ function BackFace({ name, company, email, website, defaultImageUrl, digitalFootp
                                     iconColor={color}
                                     title={m.title}
                                     text={m.summary}
+                                    url={m.url}
                                     isYoutube={isYt}
                                 />
                             );
@@ -284,12 +294,13 @@ function SocialIcon({ href, bg = 'bg-white/10', children }: { href: string; bg?:
  * @param {string} props.iconColor - Tailwind text color class for the icon.
  * @param {string} props.title - Short title of the mention.
  * @param {string} props.text - Descriptive text or summary.
+ * @param {string} [props.url] - Optional link for the mention.
  * @param {boolean} [props.isYoutube] - Whether to use a specialized YouTube logo instead of a generic icon.
  * @returns {JSX.Element} The rendered MentionLink component.
  */
-function MentionLink({ icon, iconColor, title, text, isYoutube }: { icon: string; iconColor: string; title: string; text: string; isYoutube?: boolean }) {
+function MentionLink({ icon, iconColor, title, text, url, isYoutube }: { icon: string; iconColor: string; title: string; text: string; url?: string | null; isYoutube?: boolean }) {
     return (
-        <a href="#" className="flex flex-col gap-1.5 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors border border-white/5 group block">
+        <a href={url || "#"} target={url ? "_blank" : undefined} rel={url ? "noopener noreferrer" : undefined} className="flex flex-col gap-1.5 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors border border-white/5 group block">
             <div className="flex items-center gap-2">
                 {isYoutube ? (
                     <svg className="w-[16px] h-[16px] text-gray-300" fill="currentColor" viewBox="0 0 24 24"><path fillRule="evenodd" d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z" clipRule="evenodd" /></svg>

@@ -1,5 +1,3 @@
-import type { DashboardData } from '@/types/dashboard';
-
 /**
  * Domain Logic: Timeline Assessment
  * Maps the 4 core BANT Timeline categories:
@@ -41,7 +39,7 @@ export interface TimelineEvaluation {
     };
 }
 
-export function evaluateTimeline(data: DashboardData): TimelineEvaluation {
+export function evaluateTimeline(data: any): TimelineEvaluation {
     const tl = data.bant_timeline;
 
     if (!tl) {
@@ -65,7 +63,7 @@ export function evaluateTimeline(data: DashboardData): TimelineEvaluation {
 
     // Normalize current stage index
     const stageLower = tl.buying_stage.toLowerCase();
-    const currentIndex = tl.all_stages.findIndex(s => s.toLowerCase() === stageLower);
+    const currentIndex = tl.all_stages.findIndex((s: string) => s.toLowerCase() === stageLower);
 
     return {
         compellingEvents: {

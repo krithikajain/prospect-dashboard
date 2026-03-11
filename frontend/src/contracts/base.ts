@@ -59,8 +59,22 @@ export type SeniorityLevel = 'IC' | 'Manager' | 'Director' | 'VP' | 'C-Level';
 export type DecisionAuthority = 'None' | 'Influencer' | 'Partial' | 'Final';
 
 /** Mention types — drives icon selection on ProfileCard back face. */
-export type MentionType = 'podcast' | 'article' | 'video' | 'webinar' | 'social';
+export type MentionType = 'podcast' | 'article' | 'video' | 'webinar' | 'social' | 'blog';
 
+
+// ─── Seller Contract (The User) ────────────────────────────────────────────────
+
+/**
+ * The person / company using the dashboard to prospect.
+ */
+export interface SellerContract {
+    sellerName: string | null;
+    sellerEmail: string | null;
+    companyName: string;
+    productCategory: string;
+    targetCompanySize: string[];
+    targetIndustries: string[];
+}
 
 // ─── Identity Contract (The Person) ──────────────────────────────────────────
 

@@ -22,7 +22,7 @@ export const NAV_CONFIG: readonly NavSection[] = [
     { id: 'home', label: 'Home', icon: 'home' },
     {
         id: 'prospect',
-        label: 'Prospect',
+        label: 'Prospects',
         icon: 'person_search',
         tabs: [
             { id: 'profile', label: 'Profile', icon: 'person' },
@@ -42,13 +42,5 @@ export const NAV_CONFIG: readonly NavSection[] = [
             { id: 'bant_timeline', label: 'Timeline', icon: 'schedule' },
         ]
     },
-    { id: 'need', label: 'Need', icon: 'psychology' },
-    {
-        id: 'proposition',
-        label: 'Proposition',
-        icon: 'lightbulb',
-        tabs: [
-            { id: 'timeline', label: 'Timeline', icon: 'timeline' }
-        ]
-    },
+    { id: 'solutions', label: 'Solutions', icon: 'lightbulb' },
 ] as const;

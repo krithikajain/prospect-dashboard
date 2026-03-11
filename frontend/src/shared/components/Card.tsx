@@ -67,7 +67,7 @@ export function DataInsight({ label, value, highlight = false, className }: { la
     return (
         <div className={className}>
             <p className="text-[10px] text-secondary-text font-bold uppercase tracking-wider mb-1">{label}</p>
-            <p className={`text-sm ${highlight ? 'font-semibold text-emerald-600' : 'font-medium'}`}>{value}</p>
+            <div className={`text-sm ${highlight ? 'font-semibold text-emerald-600' : 'font-medium'}`}>{value}</div>
         </div>
     )
 }

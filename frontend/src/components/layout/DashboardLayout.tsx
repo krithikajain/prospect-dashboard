@@ -42,8 +42,8 @@ export function DashboardLayout({
             {/* User Profile / Meta - Top Floating */}
             <ProfileDropdown />
 
-            <main className="flex-1 flex flex-col pt-32 px-12 pb-12 overflow-y-auto">
-                <div className="max-w-[1400px] mx-auto w-full flex flex-col">
+            <main className="flex-1 flex flex-col pt-20 px-12 pb-12 overflow-y-auto">
+                <div className="max-w-[1400px] mx-auto w-full flex-1 flex flex-col h-full">
 
                     {/* Folder-Style Tab Bar - Visible when a section has nested tabs */}
                     {currentSectionConfig?.tabs && currentSectionConfig.tabs.length > 0 && (

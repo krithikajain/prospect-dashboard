@@ -14,9 +14,9 @@ export function usePromptController() {
      * it triggers a fetch using the existing identity/organization context.
      * 
      * @param tabName - The ID of the tab (e.g., 'power', 'pain', 'path')
-     * @param overrideContext - Fresh identity/org data to use instead of the potentially-stale SSoT
+     * @param overrideContext - Fresh identity/org/seller data to use instead of the potentially-stale SSoT
      */
-    const handleTabChange = async (tabName: string, overrideContext?: { identity: any; organization: any }) => {
+    const handleTabChange = async (tabName: string, overrideContext?: { identity: any; organization: any; seller?: any }) => {
         // We only care about dynamically fetching specific functional "insight" tabs
         const insightKeys = ['profile', 'power', 'pain', 'path'] as const;
         type InsightKey = typeof insightKeys[number];
@@ -47,7 +47,8 @@ export function usePromptController() {
             // Use override context (fresh) or fall back to SSoT context
             const context = overrideContext ?? {
                 identity: prospectingData.identity,
-                organization: prospectingData.organization
+                organization: prospectingData.organization,
+                seller: prospectingData.seller
             };
 
             // Fetch LLM data
@@ -83,7 +84,7 @@ export function usePromptController() {
  */
 async function fetchTabData(
     tabName: 'profile' | 'power' | 'pain' | 'path',
-    context: { identity: any, organization: any }
+    context: { identity: any, organization: any, seller?: any }
 ) {
     console.log(`[Prompt Execution] Fetching '${tabName}'...`);
 
@@ -99,7 +100,11 @@ async function fetchTabData(
         bio: context.identity.bio || null,
     } : null;
 
-    const payload = { identity, organization: context.organization || null };
+    const payload = {
+        identity,
+        organization: context.organization || null,
+        seller: context.seller || null
+    };
 
     try {
         const response = await fetch(`http://localhost:8000/api/prospect/${tabName}`, {

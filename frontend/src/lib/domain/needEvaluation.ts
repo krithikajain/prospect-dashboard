@@ -1,4 +1,4 @@
-import type { DashboardData } from '@/types/dashboard';
+
 
 /**
  * Domain Logic: Need Assessment
@@ -27,27 +27,26 @@ interface NeedEvaluation {
     };
 }
 
-export function evaluateNeed(data: DashboardData): NeedEvaluation {
+export function evaluateNeed(data: any): NeedEvaluation {
     return {
         corePain: {
-            impact: data.pain_urgency.business_impact,
-            metrics: data.pain_urgency.impact_metrics,
+            impact: data?.pain_urgency?.business_impact || "Business impact undefined. Complete Need Analysis.",
+            metrics: data?.pain_urgency?.impact_metrics || ["TBD"],
         },
         strategicMandates: {
-            urgencyLevel: data.pain_urgency.urgency_level,
-            drivers: data.pain_urgency.decision_drivers,
+            urgencyLevel: data?.pain_urgency?.urgency_level || 'Medium',
+            drivers: data?.pain_urgency?.decision_drivers || ["TBD"],
         },
         competitivePressures: {
-            marketPressures: data.profile_fit.business.market_pressures,
-            industryGrowth: data.industry_trends.growth_rate,
+            marketPressures: data?.profile_fit?.business?.market_pressures || "Unknown pressure.",
+            industryGrowth: data?.industry_trends?.growth_rate || "Unknown",
         },
         workflowGaps: {
-            painPoints: data.pain_urgency.pain_points,
-            // Fallback since velocity_path is optional
-            infrastructure: data.velocity_path?.ecosystem_fit.infrastructure.value || 'Unknown',
+            painPoints: data?.pain_urgency?.pain_points || ["TBD"],
+            infrastructure: data?.velocity_path?.ecosystem_fit?.infrastructure?.value || 'Unknown',
         },
         executiveVisibility: {
-            visibility: data.pain_urgency.executive_visibility,
+            visibility: data?.pain_urgency?.executive_visibility || 'Unknown',
         }
     };
 }

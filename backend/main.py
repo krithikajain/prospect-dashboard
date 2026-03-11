@@ -3,15 +3,18 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime, timezone
 import uuid
+from typing import Optional
 
 # Import our new scalable prompt modules
-from features.shared.contracts import PromptContext, ResponseMeta
+from features.shared.contracts import PromptContext, ResponseMeta, ValidateEmailResponse
 from features.shared.llm_client import generate_json
+from features.shared.enrichment_service import enrichment_service
 from features.prospect.profile import (
     PROFILE_SYSTEM_PROMPT,
     build_profile_prompt,
     ProfilePromptResponse
 )
+from pydantic import BaseModel
 
 # Demo seller context — simulates a logged-in user
 # When auth is added, replace with DB lookup after login
@@ -43,6 +46,44 @@ def read_root():
 def health_check():
     return {"status": "ok", "message": "Orchestrator is running"}
 
+class EnrichRequest(BaseModel):
+    email: str
+    firstName: Optional[str] = None
+    lastName: Optional[str] = None
+
+class UserOnboardRequest(BaseModel):
+    sellerName: str
+    sellerEmail: str
+    companyName: str
+    productCategory: str
+    targetCompanySize: list[str]
+    targetIndustries: list[str]
+
+# Simple in-memory mock store for users during demo
+mock_users_db = {}
+
+@app.get("/api/user/{email}")
+def get_user(email: str):
+    user = mock_users_db.get(email)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
+
+@app.post("/api/user/onboard")
+def onboard_user(req: UserOnboardRequest):
+    mock_users_db[req.sellerEmail] = req.model_dump()
+    return {"status": "success"}
+
+@app.post("/api/prospect/verify-enrich", response_model=ValidateEmailResponse)
+async def verify_and_enrich_prospect(req: EnrichRequest):
+    """
+    Step 1 of the pipeline: Verify deliverability, check cache, fetch ContactOut.
+    Called BEFORE any LLM tab fetch.
+    """
+    logger.info(f"[Enrichment] Received verification request for: {req.email}")
+    response = await enrichment_service.validate_and_enrich(req.email, req.firstName, req.lastName)
+    return response
+
 @app.post("/api/prospect/profile")
 def generate_profile(req: PromptContext):
     """
@@ -57,8 +98,8 @@ def generate_profile(req: PromptContext):
       5. Return to frontend
     """
     
-    # 0. Inject demo seller context (future: load from auth/DB)
-    req.seller = DEMO_SELLER
+    # 0. Inject demo seller context if not provided by frontend (future: load from auth/DB)
+    req.seller = req.seller or DEMO_SELLER
     
     # 1. Build the prompts
     user_prompt = build_profile_prompt(req)
@@ -101,3 +142,28 @@ def generate_profile(req: PromptContext):
         "_meta": meta.model_dump(),
         "profile": validated_response.model_dump()
     }
+
+@app.post("/api/prospect/power")
+def generate_power(req: PromptContext):
+    return { "_meta": { "modelVersion": "mock", "generatedAt": datetime.now(timezone.utc).isoformat() }, "power": {} }
+
+@app.post("/api/prospect/pain")
+def generate_pain(req: PromptContext):
+    return { "_meta": { "modelVersion": "mock", "generatedAt": datetime.now(timezone.utc).isoformat() }, "pain": {} }
+
+@app.post("/api/prospect/path")
+def generate_path(req: PromptContext):
+    # Velocity Path dummy so frontend Path logic doesn't crash on null
+    vp = {
+        "ecosystem_fit": {
+            "infrastructure": { "value": "None" },
+            "compliance": { "value": "None" },
+            "implementation_complexity": { "level": "Unknown", "value": "TBD" }
+        },
+        "access_strategy": {
+            "contact_profile": { "founder_exits": [], "skills": [] },
+            "pedigree": [],
+            "partner_overlap": []
+        }
+    }
+    return { "_meta": { "modelVersion": "mock", "generatedAt": datetime.now(timezone.utc).isoformat() }, "path": vp, "velocity_path": vp }

@@ -34,11 +34,14 @@ export function CompanyHealth() {
 
     // We can use the native title attribute or a custom tooltip class, native title is easiest
     const industryNode = subIndustries ? (
-        <span title={subIndustries} className="cursor-help flex items-center gap-1 group">
+        <span className="cursor-help flex items-center gap-1 group relative">
             <span className="truncate">{mainIndustry}</span>
             <span className="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-full whitespace-nowrap group-hover:bg-slate-200 transition-colors">
                 +{subIndustries.split(',').length}
             </span>
+            <div className="absolute opacity-0 invisible group-hover:opacity-100 group-hover:visible top-full left-0 mt-2 bg-slate-800 text-white text-xs p-2 rounded shadow-lg z-50 min-w-[200px] whitespace-normal pointer-events-none transition-all duration-200">
+                {subIndustries}
+            </div>
         </span>
     ) : (
         mainIndustry

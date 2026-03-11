@@ -1,4 +1,5 @@
 import { useProspecting } from '@/context/ProspectingContext';
+import { SkeletonCard } from '@/shared/components';
 import { ProfileCard } from './components/ProfileCard';
 import { IcpScoreCard } from './components/IcpScoreCard';
 import { OrganizationalFootprint } from './components/OrganizationalFootprint';
@@ -23,13 +24,15 @@ export function Stage1Profile({ data }: { data?: any }) {
     const company: string = identity?.companyName || identity?.company || data?.identity?.company || '';
     const email: string | null = identity?.email || data?.identity?.email || null;
     const website: string | null = identity?.website || data?.identity?.website || null;
+    const linkedInUrl: string | null = identity?.linkedInUrl || data?.identity?.linkedInUrl || null;
 
     // ── LLM-generated profile card fields ────────────────────────────────────
     const functionalOwnership = llm?.profileCard?.persona?.functionalOwnership
         ?? data?.profile_fit?.contact?.functional_ownership
         ?? null;
 
-    const avatarUrl = llm?.profileCard?.persona?.avatarUrl
+    const avatarUrl = identity?.avatarUrl
+        ?? llm?.profileCard?.persona?.avatarUrl
         ?? data?.profile_fit?.contact?.avatar_url
         ?? undefined;
 
@@ -76,6 +79,7 @@ export function Stage1Profile({ data }: { data?: any }) {
 
             {/* LEFT COLUMN: Profile Card + ICP Score (3 cols) */}
             <div className="col-span-1 xl:col-span-3 flex flex-col gap-4 h-full">
+                {/* Profile Card ALWAYS renders with deterministic info */}
                 <ProfileCard
                     name={name}
                     company={company}
@@ -85,37 +89,47 @@ export function Stage1Profile({ data }: { data?: any }) {
                     personalityTags={personalityTags}
                     email={email}
                     website={website}
+                    linkedInUrl={linkedInUrl}
                     digitalFootprint={digitalFootprint}
                     recentNews={recentNews}
                     latestMentions={latestMentions}
                 />
-                <IcpScoreCard
-                    score={icpScore}
-                    breakdown={icpBreakdown}
-                    confidence={icpConfidence}
-                />
+
+                {/* ICP Score is AI generated */}
+                {!llm ? (
+                    <SkeletonCard padding="none" className="h-48" />
+                ) : (
+                    <IcpScoreCard
+                        score={icpScore}
+                        breakdown={icpBreakdown}
+                        confidence={icpConfidence}
+                    />
+                )}
             </div>
 
             {/* RIGHT COLUMN: Scale, Health, KPIs, Journey (9 cols) */}
             <div className="col-span-1 xl:col-span-9 flex flex-col gap-4">
-                {/* Org footprint reads from SSoT internally */}
-                <OrganizationalFootprint />
+
+                {!llm ? <SkeletonCard className="h-40" /> : <OrganizationalFootprint />}
 
                 <div className="grid grid-cols-12 gap-4">
                     <div className="col-span-5">
-                        {/* Company health reads from SSoT internally */}
-                        <CompanyHealth />
+                        {!llm ? <SkeletonCard className="h-64" /> : <CompanyHealth />}
                     </div>
                     <div className="col-span-12 xl:col-span-7">
-                        <KPIs
-                            kpis={kpisData}
-                            dataDisclaimer={llm?.kpis?.dataDisclaimer ?? null}
-                        />
+                        {!llm ? (
+                            <SkeletonCard className="h-64" />
+                        ) : (
+                            <KPIs
+                                kpis={kpisData}
+                                dataDisclaimer={llm?.kpis?.dataDisclaimer ?? null}
+                            />
+                        )}
                     </div>
                 </div>
 
                 <div className="flex-1">
-                    <ProfessionalJourney />
+                    {!llm ? <SkeletonCard className="min-h-[300px]" /> : <ProfessionalJourney />}
                 </div>
             </div>
 

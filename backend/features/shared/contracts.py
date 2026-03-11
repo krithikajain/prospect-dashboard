@@ -14,13 +14,13 @@ RevenueRange = Literal[
     "<$1M", "$1M-$10M", "$10M-$50M", "$50M-$100M",
     "$100M-$500M", "$500M-$1B", "$1B+"
 ]
-MentionType = Literal["podcast", "article", "video", "webinar", "social"]
+MentionType = Literal["podcast", "article", "video", "webinar", "social", "blog"]
 
 # ─── Seller Onboarding Enums ──────────────────────────────────────────────────
 # These map 1:1 to the pre-specified dropdown / chip options in the onboarding UI.
 
 ProductCategory = Literal[
-    "AI/ML", "Sales Intelligence", "CRM", "Marketing Automation",
+    "AI/ML", "Sales", "CRM", "Marketing Automation",
     "DevTools", "FinTech", "Security", "Data/Analytics", "HR Tech", "Other"
 ]
 
@@ -52,13 +52,13 @@ class SellerContext(BaseModel):
     sellerName: str = Field(description="The sales rep's display name")
     sellerEmail: str = Field(description="The sales rep's email (account identity)")
     companyName: str = Field(description="The seller's company name")
-    productCategory: ProductCategory = Field(description="What category of product they sell")
+    productCategory: str = Field(description="What category of product they sell")
     # Optional — seller can skip these during onboarding
-    targetCompanySize: List[CompanySizeRange] = Field(
+    targetCompanySize: List[str] = Field(
         default_factory=list,
         description="Preferred target company sizes (empty = no preference)"
     )
-    targetIndustries: List[IndustryVertical] = Field(
+    targetIndustries: List[str] = Field(
         default_factory=list,
         description="Preferred target industries (empty = no preference)"
     )
@@ -77,6 +77,9 @@ class IdentityContext(BaseModel):
     linkedInUrl: Optional[str] = None
     companySize: Optional[str] = None
     bio: Optional[str] = None
+    location: Optional[str] = None
+    employmentHistory: List[dict] = Field(default_factory=list)
+    education: List[dict] = Field(default_factory=list)
 
 class OrganizationContext(BaseModel):
     activeUsers: Optional[str] = None
@@ -85,6 +88,29 @@ class OrganizationContext(BaseModel):
     fundingCurrency: str = "USD"
     revenueGrowthRate: Optional[float] = None
     recentExitValue: Optional[int] = None
+
+class EnrichedPerson(BaseModel):
+    """Normalized output from ContactOut enrichment."""
+    fullName: str
+    currentRole: Optional[str] = None
+    companyName: Optional[str] = None
+    email: Optional[str] = None
+    personalEmails: List[str] = Field(default_factory=list)
+    workEmails: List[str] = Field(default_factory=list)
+    phones: List[str] = Field(default_factory=list)
+    linkedInUrl: Optional[str] = None
+    profileImageUrl: Optional[str] = None
+    location: Optional[str] = None
+    bio: Optional[str] = None
+    employmentHistory: List[dict] = Field(default_factory=list)  # [{title, company, start, end}]
+    education: List[dict] = Field(default_factory=list)          # [{degree, school, year}]
+    companyDomain: Optional[str] = None
+
+class ValidateEmailResponse(BaseModel):
+    """Normalized output from validation pipeline."""
+    is_valid: bool
+    validation_reason: Optional[str] = None
+    enriched_profile: Optional[EnrichedPerson] = None
 
 class PromptContext(BaseModel):
     """The normalized data payload passed to prompt builders."""

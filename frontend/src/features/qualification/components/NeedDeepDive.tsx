@@ -1,5 +1,5 @@
 import { Card, CardHeader } from '@/shared/components/Card';
-import type { DashboardData } from '@/types/dashboard';
+
 import { evaluateNeed } from '@/lib/domain/needEvaluation';
 import { StatusTag } from '@/shared/components/StatusTag';
 import { themeVariants, type StatusVariant } from '@/lib/theme';
@@ -8,7 +8,7 @@ import { themeVariants, type StatusVariant } from '@/lib/theme';
  * Signal-board layout mapping the 5 Core Categories.
  * Core question: Is this a bleeding neck or a nice-to-have?
  */
-export function NeedDeepDive({ data }: { data: DashboardData }) {
+export function NeedDeepDive({ data }: { data: any }) {
     const evaluation = evaluateNeed(data);
 
     return (

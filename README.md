@@ -1,115 +1,88 @@
-# Prospect Dashboard
+# 🚀 Prospect Radar: Full-Stack Sales Intelligence
 
-A **sales intelligence dashboard** that transforms raw prospect data into actionable insights across multiple analysis stages. Built for sales reps who need to quickly assess prospect fit, authority, budget, pain points, and deal velocity — all in one place.
+The **Prospect Radar** is a sales intelligence engine that transforms raw lead data into actionable, AI-powered insights. By defining a **Seller Context** (your product, your size, your targets) and entering a prospect's email, the platform uses **ContactOut** for deterministic data enrichment and **Gemini AI** for high-fidelity deal strategy synthesis.
 
 ---
 
-## 🚀 Quick Start
+## 🏗️ System Architecture
+
+```mermaid
+graph TD
+    A[React 19 Frontend] -- "POST /api/prospect/verify-enrich" --> B[FastAPI Backend]
+    B -- "API Call" --> C[ContactOut / QEV]
+    B -- "Cache Store" --> D[SQLite / Cloud Datastore]
+    A -- "POST /api/prospect/profile" --> B
+    B -- "Prompting" --> E[Gemini AI]
+    E -- "JSON Response" --> B
+    B -- "Typed Payload" --> A
+```
+
+---
+
+## 💻 Local Setup
+
+### 1. Backend (Python + FastAPI)
+Requires **Python 3.10+** and a virtual environment.
 
 ```bash
-# Install dependencies
-npm install
+cd backend
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
 
-# Run development server
-npm run dev
+# Create environment file from example
+cp .env.example .env
 
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
+# Run server
+uvicorn main:app --reload --port 8000
 ```
+- **API URL**: [http://localhost:8000](http://localhost:8000)
+- **Docs**: [http://localhost:8000/docs](http://localhost:8000/docs)
+
+### 2. Frontend (React + Vite)
+Requires **Node.js 18+**.
+
+```bash
+cd frontend
+npm install
+npm run dev -- --port 5173
+```
+- **Dashboard**: [http://localhost:5173](http://localhost:5173)
+
+---
+
+## 🔑 Environment Variables
+
+The backend requires a `.env` file in the `backend/` directory with the following keys:
+
+| Key | Description |
+| --- | --- |
+| `GEMINI_API_KEY` | Your Google AI SDK key (required for LLM insights). |
+| `CONTACTOUT_API_KEY` | ContactOut Search API key for prospect enrichment. |
+| `QUICKEMAILVERIFICATION_API_KEY` | Optional. Used for email deliverability checks. |
+| `CACHE_MODE` | `SQLITE` (Local) or `GCP_DATASTORE` (Production). |
 
 ---
 
 ## 🛠 Tech Stack
 
-| Layer          | Technology                                              |
-| -------------- | ------------------------------------------------------- |
-| **Framework**  | React 19 + TypeScript                                   |
-| **Bundler**    | Vite 7                                                  |
-| **Styling**    | Tailwind CSS 3.4 + custom CSS                           |
-| **Charts**     | Recharts 3.7                                            |
-| **Animations** | Framer Motion 12 · GSAP 3.14                            |
-| **UI Primitives** | Radix UI (Avatar, Dialog, Tabs, Tooltip, Dropdown…)  |
-| **Icons**      | Material Symbols Outlined · Lucide React                |
-| **Fonts**      | Inter (Google Fonts)                                    |
-| **Forms**      | React Hook Form + Zod validation                        |
-| **Utilities**  | clsx · tailwind-merge · class-variance-authority (CVA)  |
+- **Frontend**: React 19, TypeScript, Tailwind CSS, Vite 7, Radix UI.
+- **Backend**: Python 3, FastAPI, Pydantic, HTTPX, Uvicorn.
+- **Intelligence**: Gemini Pro 1.5/Flash, ContactOut API Integration.
+- **Persistence**: SQLite (Local Cache), Cloud Datastore (Cloud Mode).
 
 ---
 
-## 📐 Architecture Overview
+## � Documentation Reference
 
-The dashboard follows a **stage-based navigation** model:
+Detailed architectural and design spec files are available in the [docs/](./docs) folder:
 
-```
-┌─────────────────────────────────────────────────────────┐
-│  Navbar  (pill-based section switching)                  │
-├─────────────────────────────────────────────────────────┤
-│  Folder Tabs  (sub-tabs within a section)               │
-├─────────────────────────────────────────────────────────┤
-│                                                         │
-│   ┌──────────────────────────────────────────────┐      │
-│   │  PageHeader  (breadcrumb + title)            │      │
-│   ├──────────────────────────────────────────────┤      │
-│   │                                              │      │
-│   │  Stage View                                  │      │
-│   │  (bento grid of cards)                       │      │
-│   │                                              │      │
-│   └──────────────────────────────────────────────┘      │
-│                                                         │
-└─────────────────────────────────────────────────────────┘
-```
-
-### Navigation Sections
-
-| Section         | Tabs                               | Purpose                                   |
-| --------------- | ---------------------------------- | ----------------------------------------- |
-| **Home**        | —                                  | Landing / overview                        |
-| **Prospect**    | Profile · Power · Pain · Path      | Deep-dive into the prospect entity        |
-| **Qualification** | Budget · Authority · Need · Timeline | BANT analysis framework               |
-| **Need**        | —                                  | Need analysis (placeholder)               |
-| **Proposition** | Timeline                           | Value proposition & timeline              |
-
-### Core Patterns
-
-1. **Orchestrator →  Cards**: Each tab renders a `Stage*` component that acts as a pure layout grid, importing and arranging smaller card components.
-2. **Shared UI Primitives**: Repeated patterns (`MetricBox`, `StatusTag`, `InfoRow`, etc.) live in `components/ui/` and are imported everywhere.
-3. **Props-down data flow**: `App.tsx` normalizes JSON → passes typed data to stage orchestrators → sub-cards. No global state.
-4. **< 100 lines per file**: Every component stays small and focused.
+- [**High-Level Architecture**](./docs/DASHBOARD_ARCHITECTURE.md): System design & prompt patterns.
+- [**Folder Manifesto**](./docs/FOLDER.md): Full directory structure and file purposes.
+- [**Design System & UX**](./docs/COLORS_UX.md): Visual tokens, colors, and layout rules.
+- [**Engineering Standards**](./docs/RULES.md): Formatting and code generation guidelines.
 
 ---
 
-## 📂 Project Structure
-
-See [FOLDER.md](./FOLDER.md) for a detailed breakdown of every directory and file.
-
----
-
-## 🎨 Design System
-
-See [COLORS_UX.md](./COLORS_UX.md) for the full color palette, typography, spacing tokens, and component styling reference.
-
----
-
-## 📏 Code Rules
-
-See [RULES.md](./RULES.md) for the instructions and conventions followed when generating code for this project.
-
----
-
-## 📄 Other Docs
-
-| File                                                   | Description                                    |
-| ------------------------------------------------------ | ---------------------------------------------- |
-| [DASHBOARD_ARCHITECTURE.md](./DASHBOARD_ARCHITECTURE.md) | High-level system design & quick-reference map |
-| [FOLDER.md](./FOLDER.md)                               | Full folder tree with reusability notes        |
-| [COLORS_UX.md](./COLORS_UX.md)                        | Colors, fonts, and styling tokens              |
-| [RULES.md](./RULES.md)                                | Code generation rules & conventions            |
-
----
-
-## License
-
-Private — internal use only.
+## 📄 License
+Private — Proprietary Internal Development.

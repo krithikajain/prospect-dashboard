@@ -8,9 +8,7 @@ import { NAV_CONFIG } from '@/config/navigation';
 // Providers & Components
 import { DashboardContainer } from '@/context/ProspectingContext';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { PlaceholderView } from '@/features/shared/components/PlaceholderView';
-import { SkeletonCard } from '@/shared/components';
-
+import { PlaceholderView } from '@/features/shared';
 // Features
 import {
     Stage0Home,
@@ -18,7 +16,6 @@ import {
     Stage2Stakeholder,
     Stage4Need,
     Stage5Path,
-    Stage6Timeline,
     BudgetAssessment,
     AuthorityDeepDive,
     NeedDeepDive,
@@ -47,7 +44,7 @@ export default function App() {
 /**
  * Logic-heavy component separated from providers for clarity.
  */
-function DashboardContent({ data }: { data?: any }) {
+function DashboardContent() {
     // Application core state for navigation
     const [activeSection, setActiveSection] = useState<string>('home');
     const [activeTab, setActiveTab] = useState<string>('profile');
@@ -56,7 +53,7 @@ function DashboardContent({ data }: { data?: any }) {
     const { handleTabChange: fetchDynamicTabData, isLoading } = usePromptController();
 
     // SSoT State Controller
-    const { setProspectingData } = useProspecting();
+    const { prospectingData: data, setProspectingData } = useProspecting();
 
     /**
      * Handles top-level sidebar navigation changes.
@@ -84,43 +81,83 @@ function DashboardContent({ data }: { data?: any }) {
      * Passes the fresh identity directly to the tab fetcher to avoid
      * the React stale-closure race between setState and navigation.
      */
-    const handleExplore = (email: string) => {
-        const prefix = email.split('@')[0];
-        const domain = email.split('@')[1]?.split('.')[0] || 'Company';
-        const defaultName = prefix.replace('.', ' ').replace(/^./, c => c.toUpperCase());
-        const defaultCompany = domain.replace(/^./, c => c.toUpperCase());
+    const handleExplore = async (prospect: { firstName: string, lastName: string, email: string }, seller: any) => {
 
-        let freshIdentity = {
-            fullName: defaultName,
-            currentRole: 'Executive',
-            companyName: defaultCompany,
-            email: email
-        };
+        // 1. Await verification FIRST
+        let data: any = null;
+        try {
+            const res = await fetch('http://localhost:8000/api/prospect/verify-enrich', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(prospect)
+            });
 
-        if (email.toLowerCase().includes('satya')) {
-            freshIdentity = { fullName: 'Satya Nadella', currentRole: 'CEO', companyName: 'Microsoft', email };
-        } else if (email.toLowerCase().includes('kholmes')) {
-            freshIdentity = { fullName: 'Kevin Holmes', currentRole: 'VP of Product Strategy', companyName: 'Salesforce', email };
-        } else if (email.toLowerCase().includes('benioff')) {
-            freshIdentity = { fullName: 'Marc Benioff', currentRole: 'CEO', companyName: 'Salesforce', email };
+            if (!res.ok) {
+                alert("Could not verify email. Please try another.");
+                return;
+            }
+
+            data = await res.json();
+
+            if (!data.is_valid) {
+                alert("The email provided was not valid or could not be found. Please try another.");
+                return;
+            }
+        } catch (e) {
+            console.error("Enrichment API failed:", e);
+            alert("Error verifying email. Please check your connection or try again.");
+            return;
         }
 
-        // 1. Wipe previous insights and update identity in SSoT
+        // 2. Email is valid, we can navigate now
+        // Extract deterministic data fallbacks
+        const domain = prospect.email.split('@')[1]?.split('.')[0] || 'Company';
+        const defaultCompany = domain.replace(/^./, c => c.toUpperCase());
+
+        const deterministicIdentity: any = {
+            fullName: `${prospect.firstName} ${prospect.lastName}`,
+            currentRole: 'Executive',
+            companyName: defaultCompany,
+            email: prospect.email,
+            website: `https://www.${domain}.com`,
+            linkedInUrl: '',
+            companySize: '',
+            avatarUrl: '', // Explicit base field
+            targetCustomers: [],
+            employmentHistory: [],
+            education: [],
+            bio: ''
+        };
+
+        // If the API immediately returned enriched data (cache hit), use it right away
+        if (data && data.enriched_profile) {
+            const p = data.enriched_profile;
+            deterministicIdentity.fullName = p.fullName || deterministicIdentity.fullName;
+            deterministicIdentity.currentRole = p.currentRole || deterministicIdentity.currentRole;
+            deterministicIdentity.companyName = p.companyName || p.companyDomain || deterministicIdentity.companyName;
+            deterministicIdentity.linkedInUrl = p.linkedInUrl || '';
+            deterministicIdentity.avatarUrl = p.profileImageUrl || '';
+            deterministicIdentity.bio = p.bio || '';
+            deterministicIdentity.employmentHistory = p.employmentHistory || [];
+            deterministicIdentity.education = p.education || [];
+        }
+
+        // 3. Set state and navigate
         setProspectingData({
-            identity: freshIdentity as any,
+            identity: deterministicIdentity,
             organization: null,
+            seller: seller,
             insights: null
         });
 
-        // 2. Navigate to Prospect section + trigger the fetch immediately
-        //    with fresh context (bypassing the stale SSoT state)
         setActiveSection('prospect');
         setActiveTab('profile');
 
-        // 3. Fire the LLM fetch directly with fresh context (no stale closure)
+        // 4. Trigger Dynamic Prompt fetching (Generative part) with fresh context due to React stale closure
         fetchDynamicTabData('profile', {
-            identity: freshIdentity,
-            organization: null
+            identity: deterministicIdentity,
+            organization: null,
+            seller: seller
         });
     };
 
@@ -128,10 +165,11 @@ function DashboardContent({ data }: { data?: any }) {
      * Registry-based rendering logic for dynamic stage views.
      */
     const renderStageView = () => {
-        // 1. Loading State Check
-        if (isLoading(activeTab)) {
-            return <SkeletonCard />;
-        }
+        // 1. We no longer block the entire view on isEnriching or isLoading
+        // so that individual stages can render their own skeletons.
+        // if (isEnriching || isLoading(activeTab)) {
+        //     return <SkeletonCard />;
+        // }
 
         // 2. Section: Home
         if (activeSection === 'home') return <Stage0Home onExplore={handleExplore} />;
@@ -139,10 +177,10 @@ function DashboardContent({ data }: { data?: any }) {
         // 3. Section: Prospect (Sales Insights)
         if (activeSection === 'prospect') {
             const PROSPECT_TABS: Record<string, ReactNode> = {
-                profile: <Stage1Profile data={data} />,
-                power: <Stage2Stakeholder data={data} />,
-                pain: <Stage4Need data={data} />,
-                path: <Stage5Path data={data} />,
+                profile: <Stage1Profile data={data as any} />,
+                power: <Stage2Stakeholder data={data as any} />,
+                pain: <Stage4Need data={data as any} />,
+                path: <Stage5Path data={data as any} />,
             };
             return PROSPECT_TABS[activeTab] || null;
         }
@@ -152,21 +190,15 @@ function DashboardContent({ data }: { data?: any }) {
             const QUAL_TABS: Record<string, ReactNode> = {
                 budget: <BudgetAssessment />,
                 authority: <AuthorityDeepDive />,
-                bant_need: <NeedDeepDive data={data} />,
-                bant_timeline: <TimelineDeepDive data={data} />,
+                bant_need: <NeedDeepDive data={data as any} />,
+                bant_timeline: <TimelineDeepDive data={data as any} />,
             };
             return QUAL_TABS[activeTab] || null;
         }
 
-        // 5. Section: Proposition (Timeline)
-        if (activeSection === 'proposition') {
-            if (activeTab === 'timeline') return <Stage6Timeline data={data} />;
-            return <PlaceholderView title="Value Proposition" icon="lightbulb" />;
-        }
-
-        // 6. Section: Direct Placeholder (Future expansion)
-        if (activeSection === 'need') {
-            return <PlaceholderView title="Need Analysis" icon="psychology" />;
+        // 5. Section: Solutions (Placeholder)
+        if (activeSection === 'solutions') {
+            return <PlaceholderView title="Solutions" icon="lightbulb" />;
         }
 
         return null;

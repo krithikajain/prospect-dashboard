@@ -27,10 +27,28 @@ export function ProfessionalJourney() {
     const [tab, setTab] = useState<'Workspace' | 'Education'>('Workspace');
     const { prospectingData } = useProspecting();
     const journey = prospectingData.insights?.profile?.professionalJourney;
+    const identity = prospectingData.identity as any;
+
+    const formatPeriod = (c: any) => {
+        if (c.period) return c.period;
+        if (!c.start && !c.end) return 'Unknown Period';
+        if (c.start && !c.end) return `${c.start} - Present`;
+        return `${c.start || ''} - ${c.end}`.replace(/^ - |- $/g, '');
+    };
 
     // Use SSoT data, or fallback to mock data if not available (for skeleton/dev states)
-    const careerList = journey?.career?.length ? journey.career : careerData;
-    const educationList = journey?.education?.length ? journey.education : [];
+    const careerList = (identity?.employmentHistory?.length ? identity.employmentHistory : (journey?.career?.length ? journey.career : careerData)).slice(0, 5).map((c: any, index: number) => ({
+        period: formatPeriod(c),
+        role: c.role || c.title || 'Unknown Role',
+        company: c.company || 'Unknown Company',
+        isCurrent: c.isCurrent !== undefined ? c.isCurrent : (index === 0 && (!c.end || c.end.toLowerCase() === 'present' || c.end === '')),
+    }));
+
+    const educationList = (identity?.education?.length ? identity.education : (journey?.education?.length ? journey.education : [])).map((e: any) => ({
+        degree: e.degree || 'Degree',
+        school: e.school || 'Educational Institution',
+        year: e.year || ''
+    }));
 
     return (
         <Card padding="sm" className="flex flex-col h-full overflow-hidden">
